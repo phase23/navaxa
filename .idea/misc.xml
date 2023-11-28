@@ -3,7 +3,9 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_loaditems.xml" value="0.19947916666666668" />
+        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_islandtour.xml" value="0.12864583333333332" />
+        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_loaditems.xml" value="0.22" />
+        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_loadmaps.xml" value="0.10833333333333334" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_main.xml" value="0.18541666666666667" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_myactivity.xml" value="0.33" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_pickup.xml" value="0.18" />

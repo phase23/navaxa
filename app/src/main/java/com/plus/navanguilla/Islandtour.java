@@ -62,6 +62,7 @@ import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutput;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -74,6 +75,7 @@ import java.util.regex.Pattern;
 import com.plus.navanguilla.databinding.ActivityPickupBinding;
 import com.plus.navanguilla.util.DirectionPointListener;
 import com.plus.navanguilla.util.GetPathFromLocation;
+import com.plus.navanguilla.util.GetPathFromLocationai;
 import com.plus.navanguilla.util.Routes;
 import com.plus.navanguilla.util.Routes;
 import okhttp3.Call;
@@ -89,7 +91,7 @@ import android.content.DialogInterface;
 
 import static android.graphics.Color.RED;
 
-public class Pickup extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnPolylineClickListener {
+public class Islandtour extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnPolylineClickListener,DirectionPointListener    {
 
     String dmylat;
     String dmylon ;
@@ -122,9 +124,10 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
     Button prvieworders;
     Button startroutex;
     String itemid;
-
-
+    String responseLocation;
+    String locationnow;
     String theroute;
+    PolylineOptions options;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,10 +138,12 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 
-         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding = ActivityPickupBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-       // setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+
+
+        // setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         SharedPreferences shared = getSharedPreferences("autoLogin", MODE_PRIVATE);
         SharedPreferences.Editor prefsEditor = shared.edit();
         handler2 = new Handler(Looper.getMainLooper());
@@ -148,7 +153,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
         ll = (LinearLayout) findViewById(R.id.topbar);
         ll.setAlpha(0.5f);
 
-  itemid = getIntent().getExtras().getString("itemid","defaultKey");
+        itemid = getIntent().getExtras().getString("itemid","defaultKey");
 
 
         int SDK_INT = android.os.Build.VERSION.SDK_INT;
@@ -195,7 +200,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
 
 
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(Pickup.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(Islandtour.this);
                 builder.setTitle("Go Back");
 
                 builder.setMessage(Html.fromHtml("<b>Return to list ?</b>"));
@@ -204,7 +209,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
 
                     public void onClick(DialogInterface dialog, int which) {
                         String tag = (String) view.getTag();
-                        Intent intent = new Intent(getApplicationContext(), Loaditems.class);
+                        Intent intent = new Intent(getApplicationContext(), Myactivity.class);
                         intent.putExtra("list",itemid);
                         startActivity(intent);
 
@@ -277,11 +282,11 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
 
 
         String[] dlatng = mydestination.split("/");
-         dmylat = dlatng[0];
-         dmylon = dlatng[1];
+        dmylat = dlatng[0];
+        dmylon = dlatng[1];
 
         String sendroute = mylat +"," + mylon + ","+ dmylat + ","+dmylon;
-
+/* WAY POINTS TO GET TIME ALL
         try {
             sendforroute("https://xcape.ai/navigation/fetchroutedetails.php?location="+sendroute);
 
@@ -289,7 +294,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
             e.printStackTrace();
         }
 
-
+*/
 
 
         Double mydoublelat = 0.0;
@@ -322,11 +327,20 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
         }
 
 
+        String gosource = mydoublelat +","+mydoublelon;
+        String godest = myddoublelat +","+myddoublelon;
 
         LatLng source  = new LatLng(mydoublelat, mydoublelon);
         LatLng destination  = new LatLng(myddoublelat, myddoublelon);
-        String waypoints = "";
+        String waypoints = getwaypoints();
+        //waypoints = gosource + "|" + waypoints.trim() + "" + godest;
+         options = new PolylineOptions();
+
         String API_KEY = getResources().getString(R.string.google_maps_key);
+        String url = " https://maps.googleapis.com/maps/api/directions/json?origin="+gosource+"&destination="+godest+"&sensor=false&alternatives=false&units=imperial&key="+API_KEY+"&waypoints="+waypoints +"";
+        Log.i("myurl",url);
+        new GetPathFromLocationai(this).execute(url);
+/*
         new GetPathFromLocation(source, waypoints, destination, alternatives, walkLine, API_KEY, new DirectionPointListener() {
             @Override
             public void onPath(List<Routes> allRoutes) {
@@ -335,6 +349,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
                 drawDuration(0);
             }
         }).execute();
+*/
 
         mMap.setOnPolylineClickListener(this);
 
@@ -347,12 +362,12 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
                 .position(anguilla)
                 .title("My Location")
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.mapmarker))
-                );
+        );
 
-       // CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(anguilla, 16.0f);
+        // CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(anguilla, 16.0f);
         //mMap.animateCamera(cameraUpdate);
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(anguilla));
-       // mMap.animateCamera( CameraUpdateFactory.zoomTo( 16.0f ) );
+        // mMap.animateCamera( CameraUpdateFactory.zoomTo( 16.0f ) );
 
         LatLng location = new LatLng(myddoublelat, myddoublelon);
         Marker marker =  mMap.addMarker(new MarkerOptions().position(location).title("Destination"));
@@ -368,10 +383,23 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(anguilla));
         mMap.animateCamera( CameraUpdateFactory.zoomTo( 16.0f ) );
-      //  mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mydoublelat,mydoublelon), 16.0f), 4000, null);
+        //  mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mydoublelat,mydoublelon), 16.0f), 4000, null);
     }
 
 
+    @Override
+    public void onPath(List<Routes> routes) {
+        for (Routes route : routes) {
+            PolylineOptions options = new PolylineOptions();
+            options.addAll(route.drivingRoute);
+            options.width(10);
+            options.color(Color.RED);
+            mMap.addPolyline(options);
+        }
+    }
+
+
+    /*
     //a dotted pattern for the walk line
     final List<PatternItem> pattern = Arrays.asList(new Dot(), new Gap(20));
     // color for different routes
@@ -385,11 +413,14 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
             route = routes.get(i);
             color = routeColors[i >= routes.size() ? 0 : i];
             //draw the driving route
-            PolylineOptions options = new PolylineOptions()
-                    .addAll(route.drivingRoute)
-                    .width(10)
-                    .color(color)
-                    .clickable(true);
+            options = new PolylineOptions();
+            options.addAll(route.drivingRoute);
+            options.width(10);
+            options.color(color);
+            options.clickable(true);
+
+           // options.add(new LatLng(18.25696954161798, -62.996735501521876)); // example point
+            //options.add(new LatLng(18.252026375083627, -63.03074350126321)); // example point
             //add the route to the map
             Polyline drivingRoute = mMap.addPolyline(options);
             //add tag to the route to be accessible
@@ -413,6 +444,100 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
             mMap.addPolyline(destWalk);
             mMap.addPolyline(srcWalk);
         }
+    }
+*/
+
+    public String readFile() {
+        String fileName = "navi.txt";
+        StringBuilder stringBuilder = new StringBuilder();
+
+        FileInputStream fis = null;
+        InputStreamReader isr = null;
+        BufferedReader br = null;
+
+        try {
+            fis = openFileInput(fileName);
+            isr = new InputStreamReader(fis);
+            br = new BufferedReader(isr);
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+
+            locationnow = stringBuilder.toString();
+            // Use the file contents as needed
+            // Uncomment the line below to display a toast message with the content
+            // Toast.makeText(getApplicationContext(), "Serlat: " + locationnow, Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Error reading file
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (isr != null) {
+                try {
+                    isr.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return  locationnow;
+    }
+
+
+
+    public String getwaypoints() {
+
+        String thisdevice = Settings.Secure.getString(this.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+        String location = readFile().trim();
+        //String modifiednow = locationnow.replace(',', '/');
+        String url = "https://xcape.ai/navigation/getwaypoints.php?location="+location;
+        Log.i("action url",url);
+        OkHttpClient client = new OkHttpClient();
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+
+                .addFormDataPart("loc","loc" )
+
+                .build();
+        Request request = new Request.Builder()
+                .url(url)//your webservice url
+                .post(requestBody)
+                .build();
+        try {
+            //String responseBody;
+            okhttp3.Response response = client.newCall(request).execute();
+            // Response response = client.newCall(request).execute();
+            if (response.isSuccessful()){
+                Log.i("SUCC",""+response.message());
+            }
+            String resp = response.message();
+            responseLocation =  response.body().string().trim();
+            //responseLocation = location + "|" + responseLocation;
+            Log.i("respBody:main",responseLocation);
+            Log.i("MSG",resp);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        return responseLocation;
     }
 
     private void drawDuration(int route_id) {
@@ -587,7 +712,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
             mp.title("my position");
             mp.icon(BitmapDescriptorFactory.fromResource(R.drawable.mapmarker));
             drivermaker = mMap.addMarker(mp);
-            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
+           // mMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
 
 
             String nextroute = mydoublelat + "," + mydoublelon + "," + dmylat + "," + dmylon ;

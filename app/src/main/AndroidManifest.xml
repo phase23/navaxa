@@ -31,9 +31,15 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NavAnguilla">
         <activity
-            android:name=".Pickup"
-            android:screenOrientation="landscape"
+            android:name=".Islandtour"
             android:exported="false" />
+        <activity
+            android:name=".Loadmaps"
+            android:exported="false" />
+        <activity
+            android:name=".Pickup"
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <!--
              The API key for Google Maps-based APIs is defined as a string resource.
              (See the file "res/values/google_maps_api.xml").
@@ -48,16 +54,16 @@
 
         <activity
             android:name=".Loaditems"
-            android:screenOrientation="landscape"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".Myactivity"
-            android:screenOrientation="landscape"
-            android:exported="false" />
+            android:exported="false"
+            android:screenOrientation="portrait" />
         <activity
             android:name=".MainActivity"
-            android:screenOrientation="landscape"
-            android:exported="true">
+            android:exported="true"
+            android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 

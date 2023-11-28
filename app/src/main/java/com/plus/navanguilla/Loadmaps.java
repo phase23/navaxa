@@ -15,6 +15,8 @@ import android.content.pm.ActivityInfo;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Paint;
+import android.graphics.Path;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
@@ -58,10 +60,12 @@ import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 
 import org.json.JSONArray;
+import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.io.BufferedReader;
 import java.io.DataOutput;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -89,8 +93,10 @@ import android.content.DialogInterface;
 
 import static android.graphics.Color.RED;
 
-public class Pickup extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnPolylineClickListener {
+public class Loadmaps extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnMarkerClickListener  {
 
+
+    String locationnow;
     String dmylat;
     String dmylon ;
     String somebits;
@@ -124,7 +130,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
     String itemid;
 
 
-    String theroute;
+    String thelist;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -135,10 +141,10 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
 
-         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding = ActivityPickupBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-       // setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
+        // setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         SharedPreferences shared = getSharedPreferences("autoLogin", MODE_PRIVATE);
         SharedPreferences.Editor prefsEditor = shared.edit();
         handler2 = new Handler(Looper.getMainLooper());
@@ -148,8 +154,8 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
         ll = (LinearLayout) findViewById(R.id.topbar);
         ll.setAlpha(0.5f);
 
-  itemid = getIntent().getExtras().getString("itemid","defaultKey");
-
+        itemid = getIntent().getExtras().getString("itemid","defaultKey");
+        thelist = getIntent().getExtras().getString("list");
 
         int SDK_INT = android.os.Build.VERSION.SDK_INT;
         if (SDK_INT > 8)
@@ -164,9 +170,13 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
 
 
         distancetoplace = (TextView)findViewById(R.id.distancetoplace);
+        if (itemid.equals("1")){
+            distancetoplace.setText("Beaches");
+        }else if (itemid.equals("2")){
+            distancetoplace.setText("Restaurants");
+        }
 
 
-        theroute = getIntent().getExtras().getString("theroute");
         // String theroute = getroute(cunq, thisorderid);
 
         getback = (Button)findViewById(R.id.dialcustomer);
@@ -195,7 +205,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
 
 
 
-                AlertDialog.Builder builder = new AlertDialog.Builder(Pickup.this);
+                AlertDialog.Builder builder = new AlertDialog.Builder(Loadmaps.this);
                 builder.setTitle("Go Back");
 
                 builder.setMessage(Html.fromHtml("<b>Return to list ?</b>"));
@@ -247,6 +257,8 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
      */
+
+
     @Override
     public void onMapReady(GoogleMap googleMap) {
         mMap = googleMap;
@@ -259,84 +271,23 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
 
 
 
-
-
-        //String theroute = getroute(cunq, thisorderid, whataction);
-
-        theroute = theroute.trim();
-        String[] havles = theroute.split(Pattern.quote("~"));
-        String mylocation;
-        String mydestination;
-        mylocation = havles[0];
-        mydestination = havles[1];
-
-
-        String[] latng = mylocation.split("/");
-        String mylat = latng[0];
-        String mylon = latng[1];
-
-
-        String[] dlatng = mydestination.split("/");
-         dmylat = dlatng[0];
-         dmylon = dlatng[1];
-
-        String sendroute = mylat +"," + mylon + ","+ dmylat + ","+dmylon;
+        String getlocation = readFile();
+        String[] parts = getlocation.split(",");
+        double mydoublelat = Double.parseDouble(parts[0]);
+        double mydoublelon = Double.parseDouble(parts[1]);
 
         try {
-            sendforroute("https://xcape.ai/navigation/fetchroutedetails.php?location="+sendroute);
+            goloadmap("https://xcape.ai/navigation/loadmaps.php?list="+thelist + "&location="+getlocation);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
 
 
+     LatLng source  = new LatLng(mydoublelat, mydoublelon);
 
 
-        Double mydoublelat = 0.0;
-        try {
-            mydoublelat = Double.parseDouble(mylat);
-        } catch(NumberFormatException nfe) {
-            System.out.println("Could not parse " + nfe);
-        }
-
-        Double mydoublelon = 0.0;
-        try {
-            mydoublelon = Double.parseDouble(mylon);
-        } catch(NumberFormatException nfe) {
-            System.out.println("Could not parse " + nfe);
-        }
-
-
-        Double myddoublelat = 0.0;
-        try {
-            myddoublelat = Double.parseDouble(dmylat);
-        } catch(NumberFormatException nfe) {
-            System.out.println("Could not parse " + nfe);
-        }
-
-        Double myddoublelon = 0.0;
-        try {
-            myddoublelon = Double.parseDouble(dmylon);
-        } catch(NumberFormatException nfe) {
-            System.out.println("Could not parse " + nfe);
-        }
-
-
-
-        LatLng source  = new LatLng(mydoublelat, mydoublelon);
-        LatLng destination  = new LatLng(myddoublelat, myddoublelon);
-        String waypoints = "";
         String API_KEY = getResources().getString(R.string.google_maps_key);
-        new GetPathFromLocation(source, waypoints, destination, alternatives, walkLine, API_KEY, new DirectionPointListener() {
-            @Override
-            public void onPath(List<Routes> allRoutes) {
-                routes = allRoutes;
-                drawRoutes();
-                drawDuration(0);
-            }
-        }).execute();
-
-        mMap.setOnPolylineClickListener(this);
 
         //mMap.setOnPolylineClickListener(this);
         // Add a marker in Sydney and move the camera
@@ -347,16 +298,15 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
                 .position(anguilla)
                 .title("My Location")
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.mapmarker))
-                );
+        );
 
-       // CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(anguilla, 16.0f);
-        //mMap.animateCamera(cameraUpdate);
-        //mMap.moveCamera(CameraUpdateFactory.newLatLng(anguilla));
-       // mMap.animateCamera( CameraUpdateFactory.zoomTo( 16.0f ) );
 
-        LatLng location = new LatLng(myddoublelat, myddoublelon);
-        Marker marker =  mMap.addMarker(new MarkerOptions().position(location).title("Destination"));
-        marker.showInfoWindow();
+
+
+
+        //LatLng location = new LatLng(myddoublelat, myddoublelon);
+        //Marker marker =  mMap.addMarker(new MarkerOptions().position(location).title("Destination"));
+        //marker.showInfoWindow();
 /*
         drivermaker = mMap.addMarker(new MarkerOptions().position(anguilla).title("My Location")
                 .icon(BitmapFromVector(getApplicationContext(), R.drawable.ic_baseline_directions_car_24)));
@@ -367,8 +317,8 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
         //mMap.addMarker(new MarkerOptions().position(destination).title("DEST"));
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(anguilla));
-        mMap.animateCamera( CameraUpdateFactory.zoomTo( 16.0f ) );
-      //  mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mydoublelat,mydoublelon), 16.0f), 4000, null);
+        mMap.animateCamera( CameraUpdateFactory.zoomTo( 12.0f ) );
+        //  mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mydoublelat,mydoublelon), 16.0f), 4000, null);
     }
 
 
@@ -457,8 +407,60 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
            */
     }
 
+    public String readFile() {
+        String fileName = "navi.txt";
+        StringBuilder stringBuilder = new StringBuilder();
 
-    void sendforroute(String url) throws IOException {
+        FileInputStream fis = null;
+        InputStreamReader isr = null;
+        BufferedReader br = null;
+
+        try {
+            fis = openFileInput(fileName);
+            isr = new InputStreamReader(fis);
+            br = new BufferedReader(isr);
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+
+            locationnow = stringBuilder.toString();
+            // Use the file contents as needed
+            // Uncomment the line below to display a toast message with the content
+            // Toast.makeText(getApplicationContext(), "Serlat: " + locationnow, Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Error reading file
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (isr != null) {
+                try {
+                    isr.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return  locationnow;
+    }
+
+
+    void goloadmap(String url) throws IOException {
         Request request = new Request.Builder()
                 .url(url)
                 .build();
@@ -490,8 +492,8 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
                             @Override
                             public void run() {
 
-                                distancetoplace.setText(somebits);
 
+                               loadpointers(somebits);
 
                             }
                         });
@@ -506,13 +508,152 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
 
     }
 
-    @Override
-    public void onPolylineClick(Polyline route) {
-        //set the clicked route at the top
-        route.setZIndex(route.getZIndex() + 1);
-        //do something with the selected route..
-        drawDuration((int) route.getTag());
+
+    public void loadpointers(String json) {
+
+        try {
+            JSONArray jsonArray = new JSONArray(json);
+
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+
+                // Extracting data from JSON object
+                String placeId = jsonObject.getString("placeid");
+                String whichSite = jsonObject.getString("whichsite");
+                double distance = jsonObject.getDouble("distance");
+                String formattedDistance = String.format("%.2f", distance);
+                double dlat = jsonObject.getDouble("dlat");
+                double dlon = jsonObject.getDouble("dlon");
+                double mins = jsonObject.getDouble("mins");
+                String cord = dlat + "/"+dlon;
+
+if(itemid.equals("1")) {
+    LatLng location = new LatLng(dlat, dlon);
+    Marker marker = mMap.addMarker(new MarkerOptions()
+            .position(location)
+            .title(whichSite)
+            .icon(createCustomMarker(whichSite + "\n" + mins + " mins", Color.BLUE, Color.WHITE)));
+             marker.setTag(cord);
+             mMap.setOnMarkerClickListener(this);
+
+}else if (itemid.equals("2")) {
+
+    LatLng location = new LatLng(dlat, dlon);
+    Marker marker = mMap.addMarker(new MarkerOptions()
+            .position(location)
+            .title(whichSite)
+            .icon(createCustomMarker(whichSite + "\n" + mins + " mins", R.color.myorange, Color.WHITE)));
+            marker.setTag(cord);
+            mMap.setOnMarkerClickListener(this);
+
+
+}
+
+
+            }
+
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+
+
+
     }
+
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        // Handle the marker click event
+        //Toast.makeText(this, "Marker clicked: " + marker.getTag(), Toast.LENGTH_SHORT).show();
+
+
+        AlertDialog.Builder dialog = new AlertDialog.Builder(Loadmaps.this);
+        dialog.setCancelable(false);
+        dialog.setTitle("Let's get going");
+        dialog.setMessage("Press yes to start route to " + marker.getTitle());
+        dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+            @Override
+            public void onClick(DialogInterface dialog, int id) {
+
+
+
+                String modifiednow = locationnow.replace(',', '/');
+                String routenow = modifiednow+"~"+marker.getTag();
+
+                Log.i("ddevice",routenow + "whay:" + marker.getTag()); // Error
+                Intent activity = new Intent(getApplicationContext(), Pickup.class);
+                activity.putExtra("itemid",itemid);
+                activity.putExtra("theroute",routenow);
+                startActivity(activity);
+
+
+                //gettheroutes(marker.getTag());
+
+
+                dialog.dismiss();
+            }
+        })
+                .setNegativeButton("No ", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int which) {
+                        //Action for "Cancel".
+                        dialog.dismiss();
+                    }
+                });
+
+        final AlertDialog alert = dialog.create();
+        alert.show();
+
+
+
+
+        // Return false to indicate that we have not consumed the event and that we wish
+        // for the default behavior to occur (which is for the camera to move such that the
+        // marker is centered and for the marker's info window to open, if it has one).
+        return false;
+    }
+
+
+    private BitmapDescriptor createCustomMarker(String text, int bgColor, int textColor) {
+        Paint textPaint = new Paint();
+        textPaint.setTextSize(15); // Text size
+        textPaint.setColor(textColor); // Text color
+
+        Paint backgroundPaint = new Paint();
+        backgroundPaint.setColor(bgColor); // Background color
+
+        // Calculate the width and height of the text
+        float baseline = -textPaint.ascent(); // ascent() is negative
+        int width = (int) (textPaint.measureText(text) + 20f); // Add some padding
+        int height = (int) (baseline + textPaint.descent() + 20f);
+
+        // Define pointer size
+        int pointerWidth = 20;
+        int pointerHeight = 10;
+
+        // Increase height to accommodate the pointer
+        height += pointerHeight;
+
+        // Create a bitmap and draw background and text on it
+        Bitmap image = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(image);
+        canvas.drawRect(0, 0, width, height - pointerHeight, backgroundPaint); // Draw background
+        canvas.drawText(text, 10, baseline + 10, textPaint); // Draw text
+
+        // Draw the pointer
+        Path path = new Path();
+        path.moveTo((width - pointerWidth) / 2, height - pointerHeight); // Left point
+        path.lineTo(width / 2, height); // Bottom point
+        path.lineTo((width + pointerWidth) / 2, height - pointerHeight); // Right point
+        path.close();
+
+        canvas.drawPath(path, backgroundPaint); // Draw the pointer with background paint
+
+        return BitmapDescriptorFactory.fromBitmap(image);
+    }
+
+
 
 
 
@@ -573,32 +714,17 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
             }
 
 
-            CameraPosition position = CameraPosition.builder()
-                    .bearing(thebearing)
-                    .target(new LatLng(mydoublelat, mydoublelon))
-                    .zoom(mMap.getCameraPosition().zoom)
-                    .tilt(mMap.getCameraPosition().tilt)
-                    .build();
-
-            //mMap.clear();
-            drivermaker.remove();
-            MarkerOptions mp = new MarkerOptions();
-            mp.position(new LatLng(mydoublelat, mydoublelon));
-            mp.title("my position");
-            mp.icon(BitmapDescriptorFactory.fromResource(R.drawable.mapmarker));
-            drivermaker = mMap.addMarker(mp);
-            mMap.animateCamera(CameraUpdateFactory.newCameraPosition(position));
-
 
             String nextroute = mydoublelat + "," + mydoublelon + "," + dmylat + "," + dmylon ;
 
+           /*
             try {
-                sendforroute("https://xcape.ai/navigation/fetchroutedetails.php?location="+nextroute);
+                sendforroute("https://axfull.com/nav/fetchroutedetails.php?location="+nextroute);
 
             } catch (IOException e) {
                 e.printStackTrace();
             }
-
+*/
 /*
             mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(
                     new LatLng(mydoublelat, mydoublelon), 16));

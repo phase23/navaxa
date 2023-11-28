@@ -9,11 +9,17 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
+import android.widget.ProgressBar;
+import android.widget.TextView;
+
+import com.github.ybq.android.spinkit.sprite.Sprite;
+import com.github.ybq.android.spinkit.style.DoubleBounce;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -40,6 +46,8 @@ public class Loaditems extends AppCompatActivity {
     Button goback;
     String locationnow;
     String itemid;
+    TextView loading;
+    ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +64,10 @@ public class Loaditems extends AppCompatActivity {
 
         final LinearLayout layout = findViewById(R.id.scnf);
         goback = (Button)findViewById(R.id.backmain);
+        loading = (TextView) findViewById(R.id.loadingtext);
+         progressBar = findViewById(R.id.spin_kit);
+
+
         goback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -71,7 +83,7 @@ public class Loaditems extends AppCompatActivity {
 
         try {
             String getlocation = readFile();
-            doLoadlist("https://axfull.com/nav/loadlist.php?id="+itemid + "&location="+getlocation);
+            doLoadlist("https://xcape.ai/navigation/loadlist.php?id="+itemid + "&location="+getlocation);
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -164,10 +176,15 @@ public class Loaditems extends AppCompatActivity {
                         handler2.post(new Runnable() {
                             @Override
                             public void run() {
+                                if(itemid.equals("1")) {
+                                    beachbutton();
+                                }else if(itemid.equals("2")){
+                                    restaurantbutton();
+                                }
 
                                 othernav(someitems);
-
-
+                                loading.setVisibility(View.INVISIBLE);
+                                progressBar.setVisibility(View.GONE);
                             }
                         });
 
@@ -183,7 +200,9 @@ public class Loaditems extends AppCompatActivity {
 
     public void othernav(String json) {
         int totalWidth = getResources().getDisplayMetrics().widthPixels;
-        int margin = (int) (totalWidth * 0.30);  // 30% of screen width
+        int margin = (int) (totalWidth * 0.10);  // 30% of screen width
+
+
 
         try {
             JSONArray jsonArray = new JSONArray(json);
@@ -212,16 +231,13 @@ public class Loaditems extends AppCompatActivity {
                         AlertDialog.Builder dialog = new AlertDialog.Builder(Loaditems.this);
                         dialog.setCancelable(false);
                         dialog.setTitle("Return");
-                        dialog.setMessage("Are you sure you want start this route?" );
+                        dialog.setMessage("Are you sure you want start this route?");
                         dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
 
 
-
                                 gettheroutes(placeId);
-
-
 
 
                                 dialog.dismiss();
@@ -250,19 +266,221 @@ public class Loaditems extends AppCompatActivity {
                 int padding = 20;  // adjust this value to your liking
                 button.setPadding(padding, padding, padding, padding);
 
-                // Setting margins
+// Aligning text to the left and adding an image
+                button.setGravity(Gravity.START);  // This aligns the text to the left
+                Log.i("ddevice",itemid); // Error
+                int drawableLeft;
+                if (itemid.equals("1")){
+                    drawableLeft = R.drawable.beach;  // Replace with your drawable resource ID
+                    }else if(itemid.equals("2")){
+                    drawableLeft = R.drawable.pineat;
+                }else{
+
+                    drawableLeft = R.drawable.pineat;
+
+                }
+
+                button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
+                button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
+
+// Setting margins
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 layoutParams.setMargins(margin, 0, margin, 30);
                 button.setLayoutParams(layoutParams);
 
-                // Add the button to your layout
+// Add the button to your layout
                 LinearLayout linearLayout = findViewById(R.id.scnf); // Replace with your layout ID
                 linearLayout.addView(button);
+
             }
         } catch (JSONException e) {
             e.printStackTrace();
         }
+
+
+
+
+
+    }
+
+
+    private void beachbutton(){
+        int totalWidth = getResources().getDisplayMetrics().widthPixels;
+        int margin = (int) (totalWidth * 0.10);  // 30% of screen width
+
+        /* Button  new start here */
+        Button button = new Button(this);
+        button.setTag("1");
+        button.setText("Beach Map");
+
+        // Add an OnClickListener to handle button clicks
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Handle button click here
+                String  tag = (String) view.getTag();
+                // You can use the tag (index) to identify which button was clicked.
+
+                Intent intent = new Intent(getApplicationContext(), Loadmaps.class);
+                intent.putExtra("itemid",itemid);
+                intent.putExtra("list",tag);
+                startActivity(intent);
+
+            }
+        });
+
+
+        // Setting button height
+        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        buttonParams.height = 80;  // adjust this value to your liking
+        button.setTextSize(25);  // adjust this value to your liking
+        int padding = 20;  // adjust this value to your liking
+        button.setPadding(padding, padding, padding, padding);
+
+        // Aligning text to the left and adding an image
+        button.setGravity(Gravity.START);  // This aligns the text to the left
+        int drawableLeft;
+        // Log.i("side",tag);
+
+        drawableLeft = R.drawable.beachmap;  // Replace with your drawable resource ID
+
+        button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
+        button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
+
+// Setting margins
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(margin, 0, margin, 30);
+        button.setLayoutParams(layoutParams);
+
+// Add the button to your layout
+        LinearLayout linearLayout = findViewById(R.id.scnf); // Replace with your layout ID
+        linearLayout.addView(button);
+
+        /* Button New End Here */
+
+    }
+
+
+    private void restaurantbutton(){
+        int totalWidth = getResources().getDisplayMetrics().widthPixels;
+        int margin = (int) (totalWidth * 0.10);  // 30% of screen width
+
+        /* Button  new start here */
+        Button button = new Button(this);
+        button.setTag("2");
+        button.setText("Restaurant Map");
+
+        // Add an OnClickListener to handle button clicks
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Handle button click here
+                String  tag = (String) view.getTag();
+                // You can use the tag (index) to identify which button was clicked.
+
+                Intent intent = new Intent(getApplicationContext(), Loadmaps.class);
+                intent.putExtra("itemid",itemid);
+                intent.putExtra("list",tag);
+                startActivity(intent);
+
+            }
+        });
+
+
+
+        // Setting button height
+        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        buttonParams.height = 80;  // adjust this value to your liking
+        button.setTextSize(25);  // adjust this value to your liking
+        int padding = 20;  // adjust this value to your liking
+        button.setPadding(padding, padding, padding, padding);
+
+        // Aligning text to the left and adding an image
+        button.setGravity(Gravity.START);  // This aligns the text to the left
+        int drawableLeft;
+        // Log.i("side",tag);
+
+        drawableLeft = R.drawable.eatmap;  // Replace with your drawable resource ID
+
+        button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
+        button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
+
+// Setting margins
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(margin, 0, margin, 30);
+        button.setLayoutParams(layoutParams);
+
+// Add the button to your layout
+        LinearLayout linearLayout = findViewById(R.id.scnf); // Replace with your layout ID
+        linearLayout.addView(button);
+
+        /* Button New End Here */
+
+    }
+
+
+    private void interestbutton(){
+        int totalWidth = getResources().getDisplayMetrics().widthPixels;
+        int margin = (int) (totalWidth * 0.10);  // 30% of screen width
+
+        /* Button  new start here */
+        Button button = new Button(this);
+        button.setTag("2");
+        button.setText("Interest Map");
+
+        // Add an OnClickListener to handle button clicks
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Handle button click here
+                String  tag = (String) view.getTag();
+                // You can use the tag (index) to identify which button was clicked.
+
+                Intent intent = new Intent(getApplicationContext(), Loadmaps.class);
+                intent.putExtra("itemid",itemid);
+                intent.putExtra("list",tag);
+                startActivity(intent);
+
+            }
+        });
+
+
+
+        // Setting button height
+        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        buttonParams.height = 80;  // adjust this value to your liking
+        button.setTextSize(25);  // adjust this value to your liking
+        int padding = 20;  // adjust this value to your liking
+        button.setPadding(padding, padding, padding, padding);
+
+        // Aligning text to the left and adding an image
+        button.setGravity(Gravity.START);  // This aligns the text to the left
+        int drawableLeft;
+        // Log.i("side",tag);
+
+        drawableLeft = R.drawable.eatmap;  // Replace with your drawable resource ID
+
+        button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
+        button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
+
+// Setting margins
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(margin, 0, margin, 30);
+        button.setLayoutParams(layoutParams);
+
+// Add the button to your layout
+        LinearLayout linearLayout = findViewById(R.id.scnf); // Replace with your layout ID
+        linearLayout.addView(button);
+
+        /* Button New End Here */
+
     }
 
 
@@ -275,8 +493,8 @@ public class Loaditems extends AppCompatActivity {
 
         try {
 
-            System.out.println("https://axfull.com/nav/getroute.php?&id=" + placeid );
-            returnroute("https://axfull.com/nav/getroute.php?&id=" + placeid );
+            System.out.println("https://xcape.ai/navigation/getroute.php?&id=" + placeid );
+            returnroute("https://xcape.ai/navigation/getroute.php?&id=" + placeid );
 
         } catch (IOException e) {
             e.printStackTrace();

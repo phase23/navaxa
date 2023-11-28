@@ -18,7 +18,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="36dp"
+            android:layout_marginBottom="5dp"
             android:text="Select Your Activity"
             android:textSize="26sp"
             android:textStyle="bold" />

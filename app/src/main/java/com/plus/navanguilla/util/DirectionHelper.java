@@ -26,9 +26,12 @@ public class DirectionHelper {
             for (int i = 0; i < jRoutes.length(); i++) {
                 Routes route = new Routes();
                 jLegs = ((JSONObject) jRoutes.get(i)).getJSONArray("legs");
+
+                List<LatLng> points = new ArrayList<>();
+
                 /** Traversing all legs */
                 for (int j = 0; j < jLegs.length(); j++) {
-                    List<LatLng> points = new ArrayList<>();
+
 
                     JSONObject duration = ((JSONObject) jLegs.get(j)).getJSONObject("duration");
                     route.text_duration = duration.getString("text");

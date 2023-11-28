@@ -21,15 +21,17 @@ public class GetPathFromLocation extends AsyncTask<String, Void, List<Routes>> {
 
     private String TAG = "GetPathFromLocation";
     private String API_KEY;
+    private String waypoints = "";
     private LatLng source, destination;
     private DirectionPointListener resultCallback;
     private boolean walkLine;
     private boolean alternatives;
 
-    public GetPathFromLocation(LatLng source, LatLng destination, boolean alternatives, boolean walkLine,
+    public GetPathFromLocation(LatLng source, String waypoints, LatLng destination, boolean alternatives, boolean walkLine,
                                String API_KEY, DirectionPointListener resultCallback) {
         this.API_KEY = API_KEY;
         this.source = source;
+        this.waypoints = waypoints;
         this.destination = destination;
         this.walkLine = walkLine;
         this.alternatives = alternatives;
@@ -44,7 +46,9 @@ public class GetPathFromLocation extends AsyncTask<String, Void, List<Routes>> {
         String alternatives = "alternatives=" + this.alternatives;
         String parameters = str_origin + "&" + str_dest + "&" + sensor + "&" + alternatives + "&" + units;
         String output = "json";
-        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + API_KEY;
+        String url = "https://maps.googleapis.com/maps/api/directions/" + output + "?" + parameters + "&key=" + API_KEY + "&waypoints="+waypoints;
+
+        Log.i("myurl",url);
         return url;
     }
 
