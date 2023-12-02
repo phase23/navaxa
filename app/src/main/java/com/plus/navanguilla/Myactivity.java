@@ -8,6 +8,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
@@ -25,8 +26,10 @@ import java.util.Iterator;
 
 import okhttp3.Call;
 import okhttp3.Callback;
+import okhttp3.MultipartBody;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
+import okhttp3.RequestBody;
 import okhttp3.Response;
 
 public class Myactivity extends AppCompatActivity {
@@ -38,7 +41,7 @@ public class Myactivity extends AppCompatActivity {
     String option;
     String key;
     String locationnow;
-
+    String responseLocation;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -152,6 +155,162 @@ public class Myactivity extends AppCompatActivity {
 
     }
 
+    public String gethomeloc() {
+
+        String thisdevice = Settings.Secure.getString(this.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+
+
+        //String modifiednow = locationnow.replace(',', '/');
+        String url = "https://xcape.ai/navigation/gethomeloc.php?device="+thisdevice;
+        Log.i("action url",url);
+        OkHttpClient client = new OkHttpClient();
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+
+                .addFormDataPart("loc","loc" )
+
+                .build();
+        Request request = new Request.Builder()
+                .url(url)//your webservice url
+                .post(requestBody)
+                .build();
+        try {
+            //String responseBody;
+            okhttp3.Response response = client.newCall(request).execute();
+            // Response response = client.newCall(request).execute();
+            if (response.isSuccessful()){
+                Log.i("SUCC",""+response.message());
+            }
+            String resp = response.message();
+            responseLocation =  response.body().string().trim();
+            //responseLocation = location + "|" + responseLocation;
+            Log.i("respBody:main",responseLocation);
+            Log.i("MSG",resp);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+
+        return responseLocation;
+    }
+
+
+
+    private void gohome(){
+        int totalWidth = getResources().getDisplayMetrics().widthPixels;
+        int margin = (int) (totalWidth * 0.10);  // 30% of screen width
+
+        /* Button  new start here */
+        Button button = new Button(this);
+        button.setTag("1");
+        button.setText("Return Home");
+
+        // Add an OnClickListener to handle button clicks
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Handle button click here
+                String  tag = (String) view.getTag();
+
+
+
+                AlertDialog.Builder dialog = new AlertDialog.Builder(Myactivity.this);
+                dialog.setCancelable(false);
+                dialog.setTitle("Let's get going");
+                dialog.setMessage("Press yes to start your journey home");
+                dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                    @Override
+                    public void onClick(DialogInterface dialog, int id) {
+
+
+
+
+                        String locationnow = readFile();
+                        String gohome = gethomeloc();
+
+
+                        locationnow = locationnow.replace(',', '/');
+                         gohome = gohome.replace(',', '/');
+                        String routenow = locationnow+"~"+gohome;
+                        Log.i("MSG",routenow);
+
+                        //startroute - Endroute
+                        Log.i("route",routenow); // Error
+                        Intent activity = new Intent(getApplicationContext(), Renturnhome.class);
+                        //activity.putExtra("itemid",itemid);
+                        activity.putExtra("theroute",routenow);
+                        startActivity(activity);
+
+
+
+
+
+                        dialog.dismiss();
+                    }
+                })
+                        .setNegativeButton("No ", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialog, int which) {
+                                //Action for "Cancel".
+                                dialog.dismiss();
+                            }
+                        });
+
+                final AlertDialog alert = dialog.create();
+                alert.show();
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+            }
+        });
+
+
+
+
+
+        // Setting button height
+        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        buttonParams.height = 80;  // adjust this value to your liking
+        button.setTextSize(25);  // adjust this value to your liking
+        int padding = 20;  // adjust this value to your liking
+        button.setPadding(padding, padding, padding, padding);
+
+        // Aligning text to the left and adding an image
+        button.setGravity(Gravity.START);  // This aligns the text to the left
+        int drawableLeft;
+        // Log.i("side",tag);
+
+        drawableLeft = R.drawable.locationhome;  // Replace with your drawable resource ID
+
+        button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
+        button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
+
+// Setting margins
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(margin, 0, margin, 30);
+        button.setLayoutParams(layoutParams);
+
+// Add the button to your layout
+        LinearLayout linearLayout = findViewById(R.id.scnf); // Replace with your layout ID
+        linearLayout.addView(button);
+
+        /* Button New End Here */
+
+    }
 
 
     private void islandtour(){
@@ -281,8 +440,8 @@ public class Myactivity extends AppCompatActivity {
                 String  tag = (String) view.getTag();
                 // You can use the tag (index) to identify which button was clicked.
 
-                Intent intent = new Intent(getApplicationContext(), Loadmaps.class);
-                intent.putExtra("list",tag);
+                Intent intent = new Intent(getApplicationContext(), Loaditems.class);
+                intent.putExtra("list","4");
                 startActivity(intent);
 
             }
@@ -409,6 +568,7 @@ public class Myactivity extends AppCompatActivity {
 
                             initnav(somebits);
                                 islandtour();
+                                gohome();
                                 needhelp();
                             }
                         });

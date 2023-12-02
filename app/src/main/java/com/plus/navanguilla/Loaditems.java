@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -180,7 +181,14 @@ public class Loaditems extends AppCompatActivity {
                                     beachbutton();
                                 }else if(itemid.equals("2")){
                                     restaurantbutton();
-                                }
+
+                            }else if(itemid.equals("4")){
+                                    callofficebutton();
+                                    callpolicebutton();
+                            }
+
+
+
 
                                 othernav(someitems);
                                 loading.setVisibility(View.INVISIBLE);
@@ -274,6 +282,11 @@ public class Loaditems extends AppCompatActivity {
                     drawableLeft = R.drawable.beach;  // Replace with your drawable resource ID
                     }else if(itemid.equals("2")){
                     drawableLeft = R.drawable.pineat;
+                }else if(itemid.equals("3")){
+                    drawableLeft = R.drawable.pinmaps;
+                }else if(itemid.equals("4")){
+                    drawableLeft = R.drawable.medicine;
+
                 }else{
 
                     drawableLeft = R.drawable.pineat;
@@ -303,6 +316,124 @@ public class Loaditems extends AppCompatActivity {
 
 
     }
+
+
+    private void callofficebutton(){
+        int totalWidth = getResources().getDisplayMetrics().widthPixels;
+        int margin = (int) (totalWidth * 0.10);  // 30% of screen width
+
+        /* Button  new start here */
+        Button button = new Button(this);
+        button.setTag("1");
+        button.setText("Call Office");
+
+        // Add an OnClickListener to handle button clicks
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Handle button click here
+                String  tag = (String) view.getTag();
+                // You can use the tag (index) to identify which button was clicked.
+
+                Uri number = Uri.parse("tel:4760608");
+                Intent callIntent = new Intent(Intent.ACTION_DIAL, number);
+                startActivity(callIntent);
+
+            }
+        });
+
+
+        // Setting button height
+        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        buttonParams.height = 80;  // adjust this value to your liking
+        button.setTextSize(25);  // adjust this value to your liking
+        int padding = 20;  // adjust this value to your liking
+        button.setPadding(padding, padding, padding, padding);
+
+        // Aligning text to the left and adding an image
+        button.setGravity(Gravity.START);  // This aligns the text to the left
+        int drawableLeft;
+        // Log.i("side",tag);
+
+        drawableLeft = R.drawable.calloffice;  // Replace with your drawable resource ID
+
+        button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
+        button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
+
+// Setting margins
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(margin, 0, margin, 30);
+        button.setLayoutParams(layoutParams);
+
+// Add the button to your layout
+        LinearLayout linearLayout = findViewById(R.id.scnf); // Replace with your layout ID
+        linearLayout.addView(button);
+
+        /* Button New End Here */
+
+    }
+
+
+    private void callpolicebutton(){
+        int totalWidth = getResources().getDisplayMetrics().widthPixels;
+        int margin = (int) (totalWidth * 0.10);  // 30% of screen width
+
+        /* Button  new start here */
+        Button button = new Button(this);
+        button.setTag("1");
+        button.setText("Call Police");
+
+        // Add an OnClickListener to handle button clicks
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Handle button click here
+                String  tag = (String) view.getTag();
+                // You can use the tag (index) to identify which button was clicked.
+
+                Uri number = Uri.parse("tel:4760608");
+                Intent callIntent = new Intent(Intent.ACTION_DIAL, number);
+                startActivity(callIntent);
+            }
+        });
+
+
+        // Setting button height
+        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        buttonParams.height = 80;  // adjust this value to your liking
+        button.setTextSize(25);  // adjust this value to your liking
+        int padding = 20;  // adjust this value to your liking
+        button.setPadding(padding, padding, padding, padding);
+
+        // Aligning text to the left and adding an image
+        button.setGravity(Gravity.START);  // This aligns the text to the left
+        int drawableLeft;
+        // Log.i("side",tag);
+
+        drawableLeft = R.drawable.police;  // Replace with your drawable resource ID
+
+        button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
+        button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
+
+// Setting margins
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(margin, 0, margin, 30);
+        button.setLayoutParams(layoutParams);
+
+// Add the button to your layout
+        LinearLayout linearLayout = findViewById(R.id.scnf); // Replace with your layout ID
+        linearLayout.addView(button);
+
+        /* Button New End Here */
+
+    }
+
+
+
 
 
     private void beachbutton(){

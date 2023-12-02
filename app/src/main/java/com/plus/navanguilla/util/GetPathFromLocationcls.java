@@ -9,11 +9,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.List;
 
-public class GetPathFromLocationai extends AsyncTask<String, Void, List<Routes>> {
+public class GetPathFromLocationcls extends AsyncTask<String, Void, List<Routes>> {
 
-    private DirectionPointListener listener;
+    private TourPointListener listener;
 
-    public GetPathFromLocationai(DirectionPointListener listener) {
+    public GetPathFromLocationcls(TourPointListener listener) {
         this.listener = listener;
     }
 
@@ -44,7 +44,7 @@ public class GetPathFromLocationai extends AsyncTask<String, Void, List<Routes>>
     protected void onPostExecute(List<Routes> result) {
         super.onPostExecute(result);
         if (listener != null && result != null) {
-            listener.onPath(result);
+            listener.onTour(result);
         }
     }
 

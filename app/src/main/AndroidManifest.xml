@@ -31,6 +31,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.NavAnguilla">
         <activity
+            android:name=".Renturnhome"
+            android:exported="false" />
+        <activity
             android:name=".Islandtour"
             android:exported="false" />
         <activity
