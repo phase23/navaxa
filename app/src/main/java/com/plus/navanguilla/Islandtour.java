@@ -348,14 +348,14 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
         double myLatNowDouble = Double.parseDouble(mylatnow);
         double myLonNowDouble = Double.parseDouble(mylonnow);
         mysource  = new LatLng(myLatNowDouble, myLonNowDouble);
-
+/*
         try {
             goloadmap("https://xcape.ai/navigation/markwaypoints.php");
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-
+*/
          source  = new LatLng(mydoublelat, mydoublelon);
         LatLng destination  = new LatLng(myddoublelat, myddoublelon);
         String waypointStr = getwaypoints();
