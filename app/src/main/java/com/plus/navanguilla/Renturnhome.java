@@ -24,6 +24,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.StrictMode;
 import android.provider.Settings;
+import android.speech.tts.TextToSpeech;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -89,7 +90,7 @@ import android.content.DialogInterface;
 
 import static android.graphics.Color.RED;
 
-public class Renturnhome extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnPolylineClickListener {
+public class Renturnhome extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnPolylineClickListener, TextToSpeech.OnInitListener {
 
     String dmylat;
     String dmylon ;
@@ -122,7 +123,8 @@ public class Renturnhome extends FragmentActivity implements OnMapReadyCallback,
     Button prvieworders;
     Button startroutex;
     String itemid;
-
+    private boolean isTTSInitialized = false;
+    private TextToSpeech tts;
 
     String theroute;
 
@@ -231,12 +233,27 @@ public class Renturnhome extends FragmentActivity implements OnMapReadyCallback,
 
 
 
-
+        tts = new TextToSpeech(this, this);
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
     }
+
+
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            isTTSInitialized = true;
+            // Optionally set language, pitch, etc.
+            float speechRate = 0.7f; // 50% of the normal speech rate
+            tts.setSpeechRate(speechRate);
+            tts.speak("Proceed to the route, please remember to keep left", TextToSpeech.QUEUE_FLUSH, null, null);
+        } else {
+            // Initialization failed
+        }
+    }
+
 
     /**
      * Manipulates the map once available.
@@ -577,7 +594,7 @@ public class Renturnhome extends FragmentActivity implements OnMapReadyCallback,
                     .bearing(thebearing)
                     .target(new LatLng(mydoublelat, mydoublelon))
                     .zoom(mMap.getCameraPosition().zoom)
-                    .tilt(mMap.getCameraPosition().tilt)
+                    .tilt(30.0f) // Set tilt to 30 degrees
                     .build();
 
             //mMap.clear();

@@ -11,14 +11,21 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.os.StrictMode;
 import android.provider.Settings;
+import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 import android.widget.Toast;
 
+import com.google.android.gms.maps.GoogleMap;
+import com.google.android.gms.maps.OnMapReadyCallback;
+import com.plus.navanguilla.util.DirectionPointListener;
+import com.plus.navanguilla.util.TourPointListener;
+
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.Locale;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -26,9 +33,11 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity   {
     Button finish;
     String somebits;
+
+
 
     LocationManager locationManager;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
@@ -58,6 +67,8 @@ public class MainActivity extends AppCompatActivity {
                 Settings.Secure.ANDROID_ID);
 
         createLocationFile();
+        createWayFile();
+
         try {
 
             senddevice("https://xcape.ai/navigation/deviceload.php?deviceid="+globaldevice);
@@ -81,8 +92,10 @@ public class MainActivity extends AppCompatActivity {
         });
 
 
-    }
 
+
+
+    }
 
     void senddevice(String url) throws IOException {
         Request request = new Request.Builder()
@@ -145,27 +158,6 @@ public class MainActivity extends AppCompatActivity {
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
     public void createLocationFile() {
 
 
@@ -193,9 +185,47 @@ public class MainActivity extends AppCompatActivity {
                     }
                 }
             }
+         } else {
+            // File already exists, handle accordingly
+        }
+
+
+    }
+
+
+
+    public void createWayFile() {
+
+
+
+        String fileName = "wayfile.txt";
+        String content = "18.192583092946766,-63.0976363138236|18.195838616814342,-63.08673349580098|18.200522576706323,-63.07608053256025|18.200991044243878,-63.07634663720534|18.201147317948575,-63.0754322631268";
+
+        File file = new File(getFilesDir(), fileName);
+
+        if (!file.exists()) {
+            FileOutputStream fos = null;
+            try {
+                fos = openFileOutput(fileName, Context.MODE_PRIVATE);
+                fos.write(content.getBytes());
+                // File written successfully
+            } catch (IOException e) {
+                e.printStackTrace();
+                // Error writing file
+            } finally {
+                if (fos != null) {
+                    try {
+                        fos.close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         } else {
             // File already exists, handle accordingly
         }
+
+
     }
 
 

@@ -19,6 +19,7 @@ import android.graphics.Paint;
 import android.graphics.Path;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -26,6 +27,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.StrictMode;
 import android.provider.Settings;
+import android.speech.tts.TextToSpeech;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -73,6 +75,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 import com.google.maps.android.SphericalUtil;
@@ -98,7 +101,7 @@ import android.content.DialogInterface;
 
 import static android.graphics.Color.RED;
 
-public class Islandtour extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnPolylineClickListener,DirectionPointListener, TourPointListener {
+public class Islandtour extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnPolylineClickListener,DirectionPointListener, TourPointListener, TextToSpeech.OnInitListener {
 
     String dmylat;
     String dmylon ;
@@ -139,6 +142,9 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
     LatLng source;
     LatLng mysource;
     String closestWaypointStr;
+    private static final float BEARING_TOLERANCE = 20; // 20 degrees tolerance
+    private boolean isTTSInitialized = false;
+    private TextToSpeech tts;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -152,7 +158,7 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding = ActivityPickupBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
-
+        //setContentView(R.layout.activity_islandtour);
 
         // setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         SharedPreferences shared = getSharedPreferences("autoLogin", MODE_PRIVATE);
@@ -190,11 +196,28 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
         //prvieworders = (Button)findViewById(R.id.prvieworders);
 
 
+/*
+        tts = new TextToSpeech(this, new TextToSpeech.OnInitListener() {
+            @Override
+            public void onInit(int status) {
+                if (status == TextToSpeech.SUCCESS) {
+                    int result = tts.setLanguage(Locale.US);
+
+                    if (result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED) {
+                        // Handle error if language data or support is missing
+                    }
+                } else {
+                    // Initialization failed
+                    Log.i("mydevice","speceh failed");
+                }
+            }
+        });
+
+ */
 
 
 
-
-
+        tts = new TextToSpeech(this, this);
 
 
 
@@ -254,6 +277,19 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
         mapFragment.getMapAsync(this);
     }
 
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            isTTSInitialized = true;
+            // Optionally set language, pitch, etc.
+            float speechRate = 0.7f; // 50% of the normal speech rate
+            tts.setSpeechRate(speechRate);
+            tts.speak("Proceed to the route, please remember to keep left", TextToSpeech.QUEUE_FLUSH, null, null);
+        } else {
+            // Initialization failed
+        }
+    }
+
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
@@ -268,12 +304,11 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
         mMap = googleMap;
         mRoute = mMap.addPolyline(new PolylineOptions());
 
-
         boolean walkLine = true;
         //draw alternative routes if possible
         boolean alternatives = true;
 
-
+        //Speecher.getInstance(getApplicationContext()).speak("Proceed to the route, remember to keep left");
 
 
 
@@ -433,9 +468,9 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(anguilla));
         // mMap.animateCamera( CameraUpdateFactory.zoomTo( 16.0f ) );
 
-        LatLng location = new LatLng(myddoublelat, myddoublelon);
-        Marker marker =  mMap.addMarker(new MarkerOptions().position(location).title("Destination"));
-        marker.showInfoWindow();
+       // LatLng location = new LatLng(myddoublelat, myddoublelon);
+        //Marker marker =  mMap.addMarker(new MarkerOptions().position(location).title("Destination"));
+        //marker.showInfoWindow();
 /*
         drivermaker = mMap.addMarker(new MarkerOptions().position(anguilla).title("My Location")
                 .icon(BitmapFromVector(getApplicationContext(), R.drawable.ic_baseline_directions_car_24)));
@@ -448,6 +483,29 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
         mMap.moveCamera(CameraUpdateFactory.newLatLng(anguilla));
         mMap.animateCamera( CameraUpdateFactory.zoomTo( 16.0f ) );
         //  mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mydoublelat,mydoublelon), 16.0f), 4000, null);
+
+
+
+    }
+
+
+
+    // Method to speak text
+    private void speak(String text) {
+        float speechRate = 0.8f; // 50% of the normal speech rate
+
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+    }
+
+
+
+    @Override
+    public void onDestroy() {
+        if (tts != null) {
+            tts.stop();
+            tts.shutdown();
+        }
+        super.onDestroy();
     }
 
 
@@ -481,7 +539,7 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
             PolylineOptions options = new PolylineOptions();
             options.addAll(route.drivingRoute);
             options.width(10);
-            options.color(Color.BLUE);
+            options.color(Color.RED);
             mMap.addPolyline(options);
         }
 
@@ -719,6 +777,60 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
 
 
 
+    public String getnavwaypoints() {
+        String fileName = "wayfile.txt";
+        StringBuilder stringBuilder = new StringBuilder();
+
+        FileInputStream fis = null;
+        InputStreamReader isr = null;
+        BufferedReader br = null;
+
+        try {
+            fis = openFileInput(fileName);
+            isr = new InputStreamReader(fis);
+            br = new BufferedReader(isr);
+            String line;
+
+            while ((line = br.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+
+            locationnow = stringBuilder.toString();
+            // Use the file contents as needed
+            // Uncomment the line below to display a toast message with the content
+            // Toast.makeText(getApplicationContext(), "Serlat: " + locationnow, Toast.LENGTH_LONG).show();
+        } catch (IOException e) {
+            e.printStackTrace();
+            // Error reading file
+        } finally {
+            if (br != null) {
+                try {
+                    br.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (isr != null) {
+                try {
+                    isr.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+            if (fis != null) {
+                try {
+                    fis.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+
+        return  locationnow;
+    }
+
+
+
     public String getwaypoints() {
 
         String thisdevice = Settings.Secure.getString(this.getContentResolver(),
@@ -833,7 +945,7 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
                             @Override
                             public void run() {
 
-                                distancetoplace.setText(somebits);
+                                distancetoplace.setText("Island Tour");
 
 
                             }
@@ -889,6 +1001,8 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
         @Override
         public void onReceive(Context context, Intent intent) {
             // Extract data included in the Intent
+
+
             String mylat = intent.getStringExtra("mylat"); // -1 is going to be used as the default value
             String mylon = intent.getStringExtra("mylon");
             String mybearing = intent.getStringExtra("mybearing");
@@ -915,12 +1029,57 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
                 System.out.println("Could not parse " + nfe);
             }
 
+            /*
+            String navwaypoints = getnavwaypoints();
+
+            String[] waypointArray = navwaypoints.split("\\|");
+            List<LatLng> waypoints = new ArrayList<>();
+            for (String waypoint : waypointArray) {
+                String[] latLong = waypoint.split(",");
+                double latitude = Double.parseDouble(latLong[0]);
+                double longitude = Double.parseDouble(latLong[1]);
+                waypoints.add(new LatLng(latitude, longitude));
+            }
+            */
+            List<Waypoint> waypoints = new ArrayList<>();
+            waypoints.add(new Waypoint(new LatLng(18.19238153341906, -63.09833374426017), "In 100 Meters Turn Left", 90, 50)); // Assuming 90 degrees is the bearing to turn right
+            waypoints.add(new Waypoint(new LatLng(18.192557595008015, -63.09784515360257), "Turn Left", 90, 50)); // Assuming 90 degrees is the bearing to turn right
+
+            waypoints.add(new Waypoint(new LatLng(18.195796254992818, -63.087607100510525), "At the end of the road, go straight ahead.", 90, 50)); // Assuming 0 degrees is the bearing to go straight
+            waypoints.add(new Waypoint(new LatLng(18.195840567531334, -63.087199934507524), "Go straight ahead, watch for traffic on your right", 90, 30)); // Assuming 0 degrees is the bearing to go straight
+
+            waypoints.add(new Waypoint(new LatLng(18.20000114849078, -63.076765863797235), "In 100 Metres take the 1st Exit", 45, 15)); // Assuming 0 degrees is the bearing to go straight
+            waypoints.add(new Waypoint(new LatLng(18.200270001599815, -63.076304264851736), "Take the 1st Exit", 45, 50)); // Assuming 0 degrees is the bearing to go straight
+
+            waypoints.add(new Waypoint(new LatLng(18.20090333137871, -63.07654571085362), "Take the 1st Exit", 60, 30)); // Assuming 0 degrees is the bearing to go straight
+            waypoints.add(new Waypoint(new LatLng(18.201198016627863, -63.07522519421326), "Take the 1st Exit", 202, 30)); // sandy ground going west
+            waypoints.add(new Waypoint(new LatLng(18.19591537175044, -63.08612359637553), "Turn Left", 270, 30)); //turn left going west after tastys
+            waypoints.add(new Waypoint(new LatLng(18.192558837763368, -63.09682355318245), "Continue Straight", 270, 50)); // go staright down west not back street
+            waypoints.add(new Waypoint(new LatLng(18.200650765521036, -63.0805041410244), "Continue Straight", 270, 50)); // go straight down sandyground
+            waypoints.add(new Waypoint(new LatLng(18.201027307206783, -63.08150587105852), "Turn Left", 157, 30)); // turn left sandyground to go up
+
+            waypoints.add(new Waypoint(new LatLng(18.223519108319238, -63.01142245845117), "In 100 Metres take the 1st Exit", 215, 50)); // Round about Sandyhill
+            waypoints.add(new Waypoint(new LatLng(18.223070878783407, -63.01177806290838), "take the 1st Exit", 215, 50)); // Round about Sandyhill
+
+
+            // places names
+            waypoints.add(new Waypoint(new LatLng(18.213889908109298, -63.048053439634735), "welcome to the Valley ", 296, 15)); // turn left sandyground to go up
+            waypoints.add(new Waypoint(new LatLng(18.198495834657088, -63.08581933524174), "Welcome to Sandy Ground", 270, 15)); // go straight down sandyground
+            waypoints.add(new Waypoint(new LatLng(18.193761532512006, -63.087741648177825), "Welcome to South Hill", 254, 15)); // go straight down sandyground
+            waypoints.add(new Waypoint(new LatLng(18.195840567531334, -63.087199934507524), "Sandy Ground Lookout", 90, 15)); // Assuming 0 degrees is the bearing to go straight
+
+
+
+            LatLng currentlocation = new LatLng(mydoublelat, mydoublelon);
+
+
+            checkProximityToWaypoints(currentlocation, thebearing,waypoints);
 
             CameraPosition position = CameraPosition.builder()
                     .bearing(thebearing)
                     .target(new LatLng(mydoublelat, mydoublelon))
                     .zoom(mMap.getCameraPosition().zoom)
-                    .tilt(mMap.getCameraPosition().tilt)
+                    .tilt(30.0f)
                     .build();
 
             //mMap.clear();
@@ -936,6 +1095,8 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
             String nextroute = mydoublelat + "," + mydoublelon + "," + dmylat + "," + dmylon ;
 
             try {
+
+                //updates time to loacation
                 sendforroute("https://xcape.ai/navigation/fetchroutedetails.php?location="+nextroute);
 
             } catch (IOException e) {
@@ -949,6 +1110,38 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
 
         }
     };
+
+
+
+    private void checkProximityToWaypoints(LatLng currentLocationLatLng, float currentBearing, List<Waypoint> waypoints) {
+        float[] results = new float[1];
+        for (Waypoint waypoint : waypoints) {
+            Location.distanceBetween(currentLocationLatLng.latitude, currentLocationLatLng.longitude,
+                    waypoint.getLocation().latitude, waypoint.getLocation().longitude, results);
+            if (results[0] <= waypoint.getActionRange()) {
+                if (Math.abs(waypoint.getApproachBearing() - currentBearing) <= BEARING_TOLERANCE) {
+                    // The car is approaching the waypoint from the correct direction
+                    Toast.makeText(this, "- " + waypoint.getAction(), Toast.LENGTH_LONG).show();
+                    speak(waypoint.getAction());
+
+                    break; // Stop checking further waypoints
+                }
+            }
+        }
+    }
+
+
+    private float calculateBearing(LatLng start, LatLng end) {
+        double lat1 = Math.toRadians(start.latitude);
+        double lat2 = Math.toRadians(end.latitude);
+        double deltaLon = Math.toRadians(end.longitude - start.longitude);
+
+        double y = Math.sin(deltaLon) * Math.cos(lat2);
+        double x = Math.cos(lat1) * Math.sin(lat2) - Math.sin(lat1) * Math.cos(lat2) * Math.cos(deltaLon);
+        return (float) (Math.toDegrees(Math.atan2(y, x)) + 360) % 360;
+    }
+
+
 
     @Override
     protected void onPause() {

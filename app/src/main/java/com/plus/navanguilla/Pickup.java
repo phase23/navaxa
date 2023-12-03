@@ -24,6 +24,7 @@ import android.os.Handler;
 import android.os.Looper;
 import android.os.StrictMode;
 import android.provider.Settings;
+import android.speech.tts.TextToSpeech;
 import android.text.Html;
 import android.util.Log;
 import android.util.TypedValue;
@@ -89,7 +90,7 @@ import android.content.DialogInterface;
 
 import static android.graphics.Color.RED;
 
-public class Pickup extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnPolylineClickListener {
+public class Pickup extends FragmentActivity implements OnMapReadyCallback,GoogleMap.OnPolylineClickListener, TextToSpeech.OnInitListener {
 
     String dmylat;
     String dmylon ;
@@ -122,7 +123,8 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
     Button prvieworders;
     Button startroutex;
     String itemid;
-
+    private boolean isTTSInitialized = false;
+    private TextToSpeech tts;
 
     String theroute;
 
@@ -229,13 +231,26 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
             }
         });
 
-
+        tts = new TextToSpeech(this, this);
 
 
         // Obtain the SupportMapFragment and get notified when the map is ready to be used.
         SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                 .findFragmentById(R.id.map);
         mapFragment.getMapAsync(this);
+    }
+
+    @Override
+    public void onInit(int status) {
+        if (status == TextToSpeech.SUCCESS) {
+            isTTSInitialized = true;
+            // Optionally set language, pitch, etc.
+            float speechRate = 0.7f; // 50% of the normal speech rate
+            tts.setSpeechRate(speechRate);
+            tts.speak("Proceed to the route, please remember to keep left", TextToSpeech.QUEUE_FLUSH, null, null);
+        } else {
+            // Initialization failed
+        }
     }
 
     /**
@@ -572,12 +587,13 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
                 System.out.println("Could not parse " + nfe);
             }
 
+            //float tilt = 30; // This tilts the camera by 30 degrees
 
             CameraPosition position = CameraPosition.builder()
                     .bearing(thebearing)
                     .target(new LatLng(mydoublelat, mydoublelon))
                     .zoom(mMap.getCameraPosition().zoom)
-                    .tilt(mMap.getCameraPosition().tilt)
+                    .tilt(30.0f)
                     .build();
 
             //mMap.clear();
