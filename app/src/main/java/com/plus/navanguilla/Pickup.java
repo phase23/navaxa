@@ -384,6 +384,20 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
         mMap.moveCamera(CameraUpdateFactory.newLatLng(anguilla));
         mMap.animateCamera( CameraUpdateFactory.zoomTo( 16.0f ) );
       //  mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mydoublelat,mydoublelon), 16.0f), 4000, null);
+
+
+        mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
+            @Override
+            public void onCameraIdle() {
+                float currentZoom = mMap.getCameraPosition().zoom;
+                if (currentZoom != 16.0f) {
+                    // The zoom level is not what we expected, try zooming again
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(16.0f));
+                }
+                // Else, the zoom level is as expected
+            }
+        });
+
     }
 
 
