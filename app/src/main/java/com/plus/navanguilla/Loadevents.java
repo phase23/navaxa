@@ -6,7 +6,6 @@ import androidx.core.content.ContextCompat;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -41,7 +40,7 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-public class Loaditems extends AppCompatActivity {
+public class Loadevents extends AppCompatActivity {
     String getload;
     Handler handler2;
     String returnshift;
@@ -59,6 +58,7 @@ public class Loaditems extends AppCompatActivity {
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
@@ -69,72 +69,38 @@ public class Loaditems extends AppCompatActivity {
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 
         justhelper.setBrightness(this, 75); // Sets brightness to 75%
-
-        setContentView(R.layout.activity_loaditems);
+        setContentView(R.layout.activity_loadevents);
         handler2 = new Handler(Looper.getMainLooper());
 
 
         final LinearLayout layout = findViewById(R.id.scnf);
         goback = (Button)findViewById(R.id.backmain);
         loading = (TextView) findViewById(R.id.loadingtext);
-
+        progressBar = findViewById(R.id.spin_kit);
 
 
         goback.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(Loaditems.this, Myactivity.class);
+                Intent intent = new Intent(Loadevents.this, Myactivity.class);
                 startActivity(intent);
 
             }
         });
 
 
-         itemid = getIntent().getExtras().getString("list","defaultKey");
+        itemid = "";
         Log.i("side",itemid);
-
-        if(itemid.equals("2") || itemid.equals("1") || itemid.equals("3") || itemid.equals("7") ) {
-            loadlist("distance");
-        }else{
-            loadlist("venue");
-        }
-
-
-        if(  itemid.equals("2")  ) {
-            restaurantbutton();
-
-        }
-
-    }
-
-    @Override
-    public void onBackPressed() {
-
-    }
-
-    public void loadlist(String sortorder){
-        loading.setVisibility(View.VISIBLE);
-        progressBar = findViewById(R.id.spin_kit);
-        LinearLayout linearLayout = findViewById(R.id.scnf);
-
-        for (int i = 1; i <= 950; i++) {
-            View viewToRemove = linearLayout.findViewWithTag(String.valueOf(i));
-            if (viewToRemove != null) {
-                linearLayout.removeView(viewToRemove);
-            }
-        }
-
-
-
 
         try {
             String getlocation = readFile();
-            doLoadlist("https://xcape.ai/navigation/loadlist.php?id="+itemid + "&location="+getlocation + "&sortorder=" +sortorder);
+            doLoadlist("https://xcape.ai/navigation/loadevents.php?location="+getlocation);
 
         } catch (IOException e) {
             e.printStackTrace();
         }
-    }//end list
+
+    }
 
     public String readFile() {
         String fileName = "navi.txt";
@@ -154,7 +120,7 @@ public class Loaditems extends AppCompatActivity {
                 stringBuilder.append(line);
             }
 
-             locationnow = stringBuilder.toString();
+            locationnow = stringBuilder.toString();
             // Use the file contents as needed
             // Uncomment the line below to display a toast message with the content
             // Toast.makeText(getApplicationContext(), "Serlat: " + locationnow, Toast.LENGTH_LONG).show();
@@ -200,7 +166,7 @@ public class Loaditems extends AppCompatActivity {
                 .enqueue(new Callback() {
                     @Override
                     public void onFailure(final Call call, IOException e) {
-                        Log.i("ddevice","errot " + e); // Error
+                        Log.i("ddevice","errot"); // Error
 
                         runOnUiThread(new Runnable() {
                             @Override
@@ -221,14 +187,7 @@ public class Loaditems extends AppCompatActivity {
                         handler2.post(new Runnable() {
                             @Override
                             public void run() {
-                                if(itemid.equals("1")) {
-                                    beachbutton();
 
-
-                            }else if(itemid.equals("4")){
-                                    callofficebutton();
-                                    callpolicebutton();
-                            }
 
 
 
@@ -249,21 +208,11 @@ public class Loaditems extends AppCompatActivity {
 
     }
 
-
-    public String toSentenceCase(String inputString) {
-        if (inputString == null || inputString.isEmpty()) {
-            return inputString;
-        }
-
-        return inputString.substring(0, 1).toUpperCase() + inputString.substring(1).toLowerCase();
-    }
-
-
     public void othernav(String json) {
         int totalWidth = getResources().getDisplayMetrics().widthPixels;
         int margin = (int) (totalWidth * 0.10);  // 30% of screen width
 
-
+        Log.i("jss",json);
 
         try {
             JSONArray jsonArray = new JSONArray(json);
@@ -273,32 +222,33 @@ public class Loaditems extends AppCompatActivity {
 
                 // Extracting data from JSON object
                 String placeId = jsonObject.getString("placeid");
-                String whichSite = jsonObject.getString("whichsite").trim();
+                String whichday = jsonObject.getString("whichday").trim();
+
+                String showtime = jsonObject.getString("showtime").trim();
+                String venue = jsonObject.getString("venue").trim();
+                String artist = jsonObject.getString("artist").trim();
+
                 double distance = jsonObject.getDouble("distance");
                 String formattedDistance = String.format("%.2f", distance);
-                String buttonText;
-                String onwhichSite = toSentenceCase(whichSite);
-                        Log.i("wsite",whichSite);
-                if(whichSite.equals("Monday")){
-                     buttonText = whichSite + " ";
-                } else {
+
+
+
                     // Creating button text
-                     buttonText = onwhichSite + "\n" + formattedDistance + " Miles";
-                }
+                String buttonText = whichday + "\n" + venue + "\n" + artist + "\n" + showtime +"\n" + formattedDistance + " Miles";
                 // Create a button
+                Log.i("button",buttonText);
                 Button button = new Button(this);
                 button.setTag(placeId);  // Set placeId as tag
                 button.setText(buttonText);
-                //button.setTransformationMethod(null);
-               //button.setAllCaps(false);
+
                 // Add an OnClickListener to handle button clicks
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
 
-                        AlertDialog.Builder dialog = new AlertDialog.Builder(Loaditems.this);
+                        AlertDialog.Builder dialog = new AlertDialog.Builder(Loadevents.this);
                         dialog.setCancelable(false);
-                        dialog.setTitle("Please Confirm");
+                        dialog.setTitle("Return");
                         dialog.setMessage("Are you sure you want start this route?");
                         dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
@@ -338,56 +288,31 @@ public class Loaditems extends AppCompatActivity {
                 button.setGravity(Gravity.START);  // This aligns the text to the left
                 Log.i("ddevice",itemid); // Error
                 int drawableLeft;
-                if (itemid.equals("1")){
-                    drawableLeft = R.drawable.beach;  // Replace with your drawable resource ID
-                    button.setTextColor(Color.BLACK);
-                    button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background_beach));
-
-                }else if(itemid.equals("2")){
-                    drawableLeft = R.drawable.pineat;
-                    button.setTextColor(Color.BLACK);
-                    button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background_food));
-
-                }else if(itemid.equals("3")){
-                    drawableLeft = R.drawable.mmpin;
-                }else if(itemid.equals("4")){
-                    drawableLeft = R.drawable.medicine;
-                    button.setTextColor(Color.BLACK);
-                    button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background_food));
-
-                }else if(itemid.equals("5")){
-                    drawableLeft = R.drawable.luggage;
-                    button.setTextColor(Color.BLACK);
-                    button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background_food));
 
 
-                }else if(itemid.equals("6")){
-                    drawableLeft = R.drawable.villa;
-                    button.setTextColor(Color.BLACK);
-                    button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background_food));
+                    drawableLeft = R.drawable.music;
+
+                    switch(whichday){
+                        default:
+                            button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background_ent));
+                            break;
+                        case "MONDAY":
+                        case "WEDNESDAY":
+                        case "FRIDAY":
+                        case "SUNDAY ":
+                            button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background));
+                            break;
 
 
-                }else if(itemid.equals("7")){
-                    drawableLeft = R.drawable.petroloutline;
-                    button.setTextColor(Color.BLACK);
-                    button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background_food));
-
-
-                }else{
-
-
-                    drawableLeft = R.drawable.pineat;
 
                 }
-
 
 
                 button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
                 button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
 
+
 // Setting margins
-
-
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 layoutParams.setMargins(margin, 0, margin, 30);
@@ -407,6 +332,13 @@ public class Loaditems extends AppCompatActivity {
 
 
     }
+
+
+    @Override
+    public void onBackPressed() {
+
+    }
+
 
 
     private void callofficebutton(){
@@ -592,16 +524,8 @@ public class Loaditems extends AppCompatActivity {
 
         /* Button  new start here */
         Button button = new Button(this);
-        button.setTag("99999");//so not removed
-        button.setText("Initializing..");
-
-        new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
-            @Override
-            public void run() {
-                // This code will be executed after a delay of 2 seconds
-                button.setText("Sort List A - Z");
-            }
-        }, 4000); // Delay in milliseconds (2000ms = 2s)
+        button.setTag("2");
+        button.setText("Restaurant Map");
 
         // Add an OnClickListener to handle button clicks
         button.setOnClickListener(new View.OnClickListener() {
@@ -609,17 +533,12 @@ public class Loaditems extends AppCompatActivity {
             public void onClick(View view) {
                 // Handle button click here
                 String  tag = (String) view.getTag();
+                // You can use the tag (index) to identify which button was clicked.
 
-                if(tag.equals("99999")){
-                    button.setTag("99998");
-                    button.setText("Sort by Distance");
-                    loadlist("venue");
-                }else if(tag.equals("99998")){
-                    button.setTag("99999");
-                    button.setText("Sort List A - Z");
-                    loadlist("distance");
-                }
-
+                Intent intent = new Intent(getApplicationContext(), Loadmaps.class);
+                intent.putExtra("itemid",itemid);
+                intent.putExtra("list",tag);
+                startActivity(intent);
 
             }
         });
@@ -778,6 +697,7 @@ public class Loaditems extends AppCompatActivity {
                         Intent activity = new Intent(getApplicationContext(), Pickup.class);
                         activity.putExtra("itemid",itemid);
                         activity.putExtra("theroute",routenow);
+                        activity.putExtra("preclass","1");
                         startActivity(activity);
 
 

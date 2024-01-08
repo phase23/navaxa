@@ -157,9 +157,10 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
+        //setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         binding = ActivityPickupBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         //setContentView(R.layout.activity_islandtour);
@@ -336,7 +337,7 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
             isTTSInitialized = true;
             // Optionally set language, pitch, etc.
             float speechRate = 0.7f; // 50% of the normal speech rate
-            tts.setSpeechRate(speechRate);
+            //tts.setSpeechRate(speechRate);
             tts.speak("Proceed to the route, please remember to keep left", TextToSpeech.QUEUE_FLUSH, null, null);
         } else {
             // Initialization failed
@@ -534,16 +535,23 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
         //mMap.addMarker(new MarkerOptions().position(destination).title("DEST"));
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(anguilla));
-        mMap.animateCamera( CameraUpdateFactory.zoomTo( 16.0f ) );
-        //  mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mydoublelat,mydoublelon), 16.0f), 4000, null);
+        // mMap.animateCamera( CameraUpdateFactory.zoomTo( 18.0f ) );
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mydoublelat,mydoublelon), 16.0f), 4000, null);
+
+        CameraPosition position = CameraPosition.builder()
+
+                .target(new LatLng(mydoublelat, mydoublelon))
+                .zoom(mMap.getCameraPosition().zoom)
+                .tilt(30.0f)
+                .build();
 
         mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
             public void onCameraIdle() {
                 float currentZoom = mMap.getCameraPosition().zoom;
-                if (currentZoom != 16.0f) {
+                if (currentZoom != 18.0f) {
                     // The zoom level is not what we expected, try zooming again
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(16.0f));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(18.0f));
                 }
                 // Else, the zoom level is as expected
             }
@@ -1147,6 +1155,8 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
 
         }
     };
+
+
 
 
     private void checkProximityToWaypoints(LatLng currentLocationLatLng, float currentBearing, List<Waypoint> waypoints) {

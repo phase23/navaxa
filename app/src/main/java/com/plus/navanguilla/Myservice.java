@@ -18,10 +18,17 @@ import androidx.localbroadcastmanager.content.LocalBroadcastManager;
 import java.io.FileOutputStream;
 import java.io.IOException;
 
+import okhttp3.Call;
+import okhttp3.Callback;
+import okhttp3.OkHttpClient;
+import okhttp3.Request;
+import okhttp3.Response;
+
 public class Myservice extends Service {
     private LocationManager locationManager;
     private LocationListener locationListener;
     Context mContext;
+    String somebits;
 
     @Override
     public void onCreate() {
@@ -118,6 +125,14 @@ public class Myservice extends Service {
             String thisdevice = Settings.Secure.getString(getContentResolver(),
                     Settings.Secure.ANDROID_ID);
 
+            try {
+                updatedevicelocation("https://xcape.ai/navigation/updatedevicelocation.php?lat="+latitude + "&long="+longitude + "&device="+ thisdevice);
+
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+
+
 
            /*
             FirebaseDatabase database = FirebaseDatabase.getInstance("https://axcessdrivers-default-rtdb.firebaseio.com/");
@@ -131,7 +146,37 @@ public class Myservice extends Service {
         }
 
 
+        void updatedevicelocation(String url) throws IOException {
+            Request request = new Request.Builder()
+                    .url(url)
+                    .build();
+            Log.i("ddevice",url);
+            OkHttpClient client = new OkHttpClient();
+            client.newCall(request)
+                    .enqueue(new Callback() {
+                        @Override
+                        public void onFailure(final Call call, IOException e) {
+                            Log.i("ddevice","errot"); // Error
 
+
+                        }
+
+                        @Override
+                        public void onResponse(Call call, final Response response) throws IOException {
+
+
+                            somebits = response.body().string();
+
+
+
+                        }//end if
+
+
+
+
+                    });
+
+        }
 
 
 

@@ -17,6 +17,7 @@ import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -69,6 +70,7 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -101,6 +103,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
     String responseBody;
     String responseCheck;
     String fname;
+    String prec;
     String cunq;
     String thisorderid;
     String whataction;
@@ -113,7 +116,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
     LinearLayout lb;
     private List<Routes> routes = new ArrayList<>();
     private Marker infoMarker = null;
-
+    List<Waypoint> waypoints = new ArrayList<>();
     private Marker mUserMarker;
     private Polyline mRoute;
     private Marker mStartMarker;
@@ -125,7 +128,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
     String itemid;
     private boolean isTTSInitialized = false;
     private TextToSpeech tts;
-
+    private static final float BEARING_TOLERANCE = 20;
     String theroute;
 
     @Override
@@ -136,6 +139,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
          setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding = ActivityPickupBinding.inflate(getLayoutInflater());
@@ -150,8 +154,8 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
         ll = (LinearLayout) findViewById(R.id.topbar);
         ll.setAlpha(0.5f);
 
-  itemid = getIntent().getExtras().getString("itemid","defaultKey");
-
+        itemid = getIntent().getExtras().getString("itemid","defaultKey");
+        prec = getIntent().getExtras().getString("preclass","defaultKey");
 
         int SDK_INT = android.os.Build.VERSION.SDK_INT;
         if (SDK_INT > 8)
@@ -175,7 +179,60 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
         //startroutex = (Button)findViewById(R.id.startjourney);
         //prvieworders = (Button)findViewById(R.id.prvieworders);
 
+        tts = new TextToSpeech(this, this);
+        String waymarkers = getwaymarkers();
+        try {
 
+            JSONArray jsonArray = new JSONArray(waymarkers);
+            for (int i = 0; i < jsonArray.length(); i++) {
+                JSONObject jsonObject = jsonArray.getJSONObject(i);
+                String[] latLngParts = jsonObject.getString("latlng").split(", ");
+                LatLng latLng = new LatLng(Double.parseDouble(latLngParts[0]), Double.parseDouble(latLngParts[1]));
+                String speak = jsonObject.getString("speak");
+                int bearing = jsonObject.getInt("bearing");
+                int triggerRange = jsonObject.getInt("triggerrange");
+
+                waypoints.add(new Waypoint(latLng, speak, bearing, triggerRange));
+            }
+
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            Toast.makeText(this, "Initalising.. Tour loaded", Toast.LENGTH_SHORT).show();
+            waypoints.add(new Waypoint(new LatLng(18.19238153341906, -63.09833374426017), "In 100 Meters Turn Left", 90, 50)); // Assuming 90 degrees is the bearing to turn right
+            waypoints.add(new Waypoint(new LatLng(18.192557595008015, -63.09784515360257), "Turn Left", 90, 50)); // Assuming 90 degrees is the bearing to turn right
+
+            waypoints.add(new Waypoint(new LatLng(18.195796254992818, -63.087607100510525), "At the end of the road, go straight ahead.", 90, 50)); // Assuming 0 degrees is the bearing to go straight
+            waypoints.add(new Waypoint(new LatLng(18.195840567531334, -63.087199934507524), "Go straight ahead, watch for traffic on your right", 90, 20)); // Assuming 0 degrees is the bearing to go straight
+
+            waypoints.add(new Waypoint(new LatLng(18.20000114849078, -63.076765863797235), "In 100 Metres at the roundabout take the 1st Exit", 45, 50)); // comnig down southhil
+            waypoints.add(new Waypoint(new LatLng(18.200600442446454, -63.076055893507714), "Take the 1st Exit", 28, 20)); // southhill roundabout go sandyground
+
+            waypoints.add(new Waypoint(new LatLng(18.20090333137871, -63.07654571085362), "Take the 1st Exit", 60, 30)); // coming up sandy grouond
+            waypoints.add(new Waypoint(new LatLng(18.201198016627863, -63.07522519421326), "Take the 1st Exit", 157, 50)); // sandy ground going west
+            waypoints.add(new Waypoint(new LatLng(18.19591537175044, -63.08612359637553), "Turn Left and follow the route", 270, 20)); //turn left going west after tastys
+            waypoints.add(new Waypoint(new LatLng(18.192524989949273, -63.096556513609066), "Continue Straight", 260, 50)); // go staright down west not back street
+            waypoints.add(new Waypoint(new LatLng(18.200650765521036, -63.0805041410244), "Continue Straight", 270, 50)); // go straight down sandyground
+            waypoints.add(new Waypoint(new LatLng(18.201027307206783, -63.08150587105852), "At the end of the road Turn Left", 157, 50)); // turn left sandyground to go up
+
+            waypoints.add(new Waypoint(new LatLng(18.223519108319238, -63.01142245845117), "In 100 Metres at the rounadbout take the 1st Exit", 215, 50)); // Round about Sandyhill
+            waypoints.add(new Waypoint(new LatLng(18.223070878783407, -63.01177806290838), "take the 1st Exit", 215, 15)); // Round about Sandyhill
+
+            waypoints.add(new Waypoint(new LatLng(18.207419610314545, -63.05634026686826), "In 100 Metres at the roundabout take the 1st Exit", 63, 50)); // valley roundabout going east
+            waypoints.add(new Waypoint(new LatLng(18.20793427697478, -63.055391330772196), "Take the 1st Exit", 63, 50)); // valley roundabout going east
+
+
+
+            // places names
+            waypoints.add(new Waypoint(new LatLng(18.213889908109298, -63.048053439634735), "welcome to the Valley ", 115, 15)); // turn left sandyground to go up
+            waypoints.add(new Waypoint(new LatLng(18.198495834657088, -63.08581933524174), "Welcome to Sandy Ground", 270, 15)); // go straight down sandyground
+            waypoints.add(new Waypoint(new LatLng(18.193761532512006, -63.087741648177825), "Welcome to South Hill", 254, 15)); // go straight down sandyground
+            waypoints.add(new Waypoint(new LatLng(18.19376301911901, -63.095331278322156), "Sandy Ground Lookout", 60, 15)); // Assuming 0 degrees is the bearing to go straight
+            waypoints.add(new Waypoint(new LatLng(18.21394472114308, -63.04827859987668), "Welcome to The Valley", 20, 15)); // Assuming 0 degrees is the bearing to go straight
+            waypoints.add(new Waypoint(new LatLng(18.210227731497774, -63.05394220165699), "Follow the route", 30, 15)); // Assuming 0 degrees is the bearing to go straight
+
+
+        }
 
 
 
@@ -206,7 +263,12 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
 
                     public void onClick(DialogInterface dialog, int which) {
                         String tag = (String) view.getTag();
-                        Intent intent = new Intent(getApplicationContext(), Loaditems.class);
+                        Intent intent;
+                        if(prec.equals("1")){
+                            intent   = new Intent(getApplicationContext(), Loadevents.class);
+                        }else {
+                             intent = new Intent(getApplicationContext(), Loaditems.class);
+                        }
                         intent.putExtra("list",itemid);
                         startActivity(intent);
 
@@ -246,7 +308,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
             isTTSInitialized = true;
             // Optionally set language, pitch, etc.
             float speechRate = 0.7f; // 50% of the normal speech rate
-            tts.setSpeechRate(speechRate);
+            //tts.setSpeechRate(speechRate);
             tts.speak("Proceed to the route, please remember to keep left", TextToSpeech.QUEUE_FLUSH, null, null);
         } else {
             // Initialization failed
@@ -364,6 +426,8 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
                 .icon(BitmapDescriptorFactory.fromResource(R.drawable.mapmarker))
                 );
 
+        System.out.println("Where " + mydoublelat + " " + mydoublelon);
+
        // CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(anguilla, 16.0f);
         //mMap.animateCamera(cameraUpdate);
         //mMap.moveCamera(CameraUpdateFactory.newLatLng(anguilla));
@@ -382,23 +446,67 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
         //mMap.addMarker(new MarkerOptions().position(destination).title("DEST"));
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(anguilla));
-        mMap.animateCamera( CameraUpdateFactory.zoomTo( 16.0f ) );
-      //  mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mydoublelat,mydoublelon), 16.0f), 4000, null);
+       // mMap.animateCamera( CameraUpdateFactory.zoomTo( 18.0f ) );
+       mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mydoublelat,mydoublelon), 16.0f), 4000, null);
 
+        CameraPosition position = CameraPosition.builder()
+
+                .target(new LatLng(mydoublelat, mydoublelon))
+                .zoom(mMap.getCameraPosition().zoom)
+                .tilt(30.0f)
+                .build();
 
         mMap.setOnCameraIdleListener(new GoogleMap.OnCameraIdleListener() {
             @Override
             public void onCameraIdle() {
                 float currentZoom = mMap.getCameraPosition().zoom;
-                if (currentZoom != 16.0f) {
+                if (currentZoom != 18.0f) {
                     // The zoom level is not what we expected, try zooming again
-                    mMap.animateCamera(CameraUpdateFactory.zoomTo(16.0f));
+                    mMap.animateCamera(CameraUpdateFactory.zoomTo(18.0f));
                 }
                 // Else, the zoom level is as expected
             }
         });
 
     }
+
+    public String getwaymarkers(){
+
+        String thisdevice = Settings.Secure.getString(this.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+
+        String url = "https://xcape.ai/navigation/loadwaymarkers.php?general=1";
+        Log.i("action url",url);
+        OkHttpClient client = new OkHttpClient();
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+
+                .addFormDataPart("what","this" )
+
+                .build();
+        Request request = new Request.Builder()
+                .url(url)//your webservice url
+                .post(requestBody)
+                .build();
+        try {
+            //String responseBody;
+            okhttp3.Response response = client.newCall(request).execute();
+            // Response response = client.newCall(request).execute();
+            if (response.isSuccessful()){
+                Log.i("SUCC",""+response.message());
+            }
+            String resp = response.message();
+            responseBody =  response.body().string();
+            Log.i("respBody:main",responseBody);
+            Log.i("MSG",resp);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return responseBody;
+
+
+    }
+
 
 
     //a dotted pattern for the walk line
@@ -602,6 +710,8 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
             }
 
             //float tilt = 30; // This tilts the camera by 30 degrees
+            LatLng currentlocation = new LatLng(mydoublelat, mydoublelon);
+            checkProximityToWaypoints(currentlocation, thebearing,waypoints);
 
             CameraPosition position = CameraPosition.builder()
                     .bearing(thebearing)
@@ -636,6 +746,35 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
 
         }
     };
+
+
+    // Method to speak text
+    private void speak(String text) {
+        float speechRate = 0.8f; // 50% of the normal speech rate
+
+        tts.speak(text, TextToSpeech.QUEUE_FLUSH, null, null);
+    }
+
+
+
+    private void checkProximityToWaypoints(LatLng currentLocationLatLng, float currentBearing, List<Waypoint> waypoints) {
+        float[] results = new float[1];
+        Iterator<Waypoint> iterator = waypoints.iterator();
+
+        while (iterator.hasNext()) {
+            Waypoint waypoint = iterator.next();
+            Location.distanceBetween(currentLocationLatLng.latitude, currentLocationLatLng.longitude,
+                    waypoint.getLocation().latitude, waypoint.getLocation().longitude, results);
+
+            if (results[0] <= waypoint.getActionRange()) {
+                if (Math.abs(waypoint.getApproachBearing() - currentBearing) <= BEARING_TOLERANCE) {
+                    speak(waypoint.getAction()); // Speak the message
+                    iterator.remove(); // Remove the waypoint from the list
+                    break; // Stop checking further waypoints
+                }
+            }
+        }
+    }
 
     @Override
     protected void onPause() {

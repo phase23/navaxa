@@ -139,7 +139,7 @@ public class Loadmaps extends FragmentActivity implements OnMapReadyCallback,Goo
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
                 WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_PORTRAIT);
         binding = ActivityPickupBinding.inflate(getLayoutInflater());
@@ -613,6 +613,8 @@ if(itemid.equals("1")) {
         // marker is centered and for the marker's info window to open, if it has one).
         return false;
     }
+
+
 
 
     private BitmapDescriptor createCustomMarker(String text, int bgColor, int textColor) {

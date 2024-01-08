@@ -1,10 +1,15 @@
 package com.plus.navanguilla;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.content.ContextCompat;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.graphics.Color;
+import android.graphics.Typeface;
+import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
@@ -12,6 +17,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
@@ -49,6 +55,19 @@ public class Myactivity extends AppCompatActivity {
         handler2 = new Handler(Looper.getMainLooper());
 
         final LinearLayout layout = findViewById(R.id.scnf);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+        // Hide the status bar.
+        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
+
+        // Hide the navigation bar.
+        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
+        AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
+        int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
+        audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
+
+        justhelper.setBrightness(this, 75); // Sets brightness to 75%
 
 
 
@@ -125,17 +144,26 @@ public class Myactivity extends AppCompatActivity {
 
                 }else if(key.equals("2")){
                     drawableLeft = R.drawable.pineat;
+                }else if(key.equals("5")){
+                    drawableLeft = R.drawable.luggage;
+                }else if(key.equals("6")){
+                    drawableLeft = R.drawable.villa;
+
+                }else if(key.equals("7")){
+                    drawableLeft = R.drawable.petrol;
+
                 }else{
-                    drawableLeft = R.drawable.pinmaps;
+                    drawableLeft = R.drawable.mmpin;
             }
 
                 button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
                 button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
+                button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background));
 
 // Setting margins
                 LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-                layoutParams.setMargins(margin, 0, margin, 30);
+                layoutParams.setMargins(margin, 0, margin, 55);
                 button.setLayoutParams(layoutParams);
 
 // Add the button to your layout
@@ -154,6 +182,12 @@ public class Myactivity extends AppCompatActivity {
 
 
     }
+
+    @Override
+    public void onBackPressed() {
+
+    }
+
 
     public String gethomeloc() {
 
@@ -297,11 +331,12 @@ public class Myactivity extends AppCompatActivity {
 
         button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
         button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
+        button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background));
 
 // Setting margins
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(margin, 0, margin, 30);
+        layoutParams.setMargins(margin, 0, margin, 55);
         button.setLayoutParams(layoutParams);
 
 // Add the button to your layout
@@ -311,6 +346,11 @@ public class Myactivity extends AppCompatActivity {
         /* Button New End Here */
 
     }
+
+
+
+
+
 
 
     private void islandtour(){
@@ -345,7 +385,7 @@ public class Myactivity extends AppCompatActivity {
                         String locationnow = readFile();
 
                         String modifiednow = locationnow.replace(',', '/');
-                        modifiednow = "18.177562900181787/-63.139738157244835";
+                       // modifiednow = "18.177562900181787/-63.139738157244835";
                         //String routenow = modifiednow+"~18.2567503457155/-63.00025013253823";
                         String routenow = modifiednow+"~"+"18.18656230761481/-63.13412319134523";
 
@@ -408,11 +448,12 @@ public class Myactivity extends AppCompatActivity {
 
         button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
         button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
+        button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background));
 
 // Setting margins
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(margin, 0, margin, 30);
+        layoutParams.setMargins(margin, 0, margin, 55);
         button.setLayoutParams(layoutParams);
 
 // Add the button to your layout
@@ -430,7 +471,7 @@ public class Myactivity extends AppCompatActivity {
 
         Button button = new Button(this);
         button.setTag("1");
-        button.setText("Need Help?");
+        button.setText("Emergencies");
 
         // Add an OnClickListener to handle button clicks
         button.setOnClickListener(new View.OnClickListener() {
@@ -446,6 +487,7 @@ public class Myactivity extends AppCompatActivity {
 
             }
         });
+
 
 
         // Setting button height
@@ -465,11 +507,76 @@ public class Myactivity extends AppCompatActivity {
 
         button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
         button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
+        button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background));
 
 // Setting margins
         LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
-        layoutParams.setMargins(margin, 0, margin, 30);
+        layoutParams.setMargins(margin, 0, margin, 55);
+        button.setLayoutParams(layoutParams);
+
+// Add the button to your layout
+        LinearLayout linearLayout = findViewById(R.id.scnf); // Replace with your layout ID
+        linearLayout.addView(button);
+
+
+    }
+
+
+    private void ent(){
+
+        int totalWidth = getResources().getDisplayMetrics().widthPixels;
+        int margin = (int) (totalWidth * 0.10);  // 30% of screen width
+
+        Button button = new Button(this);
+        button.setTag("1");
+        button.setText("Entertainment");
+        button.setTextColor(Color.WHITE);
+       //button.setTypeface(Typeface.create("sans-serif-medium", Typeface.NORMAL));
+        // Add an OnClickListener to handle button clicks
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Handle button click here
+                String  tag = (String) view.getTag();
+                // You can use the tag (index) to identify which button was clicked.
+
+                Intent intent = new Intent(getApplicationContext(), Loadevents.class);
+                intent.putExtra("list","5");
+                startActivity(intent);
+
+            }
+        });
+
+
+
+        // Setting button height
+        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        buttonParams.height = 80;  // adjust this value to your liking
+        button.setTextSize(25);  // adjust this value to your liking
+        int padding = 20;  // adjust this value to your liking
+        button.setPadding(padding, padding, padding, padding);
+
+        // Aligning text to the left and adding an image
+        button.setGravity(Gravity.START);  // This aligns the text to the left
+        int drawableLeft;
+        // Log.i("side",tag);
+
+        drawableLeft = R.drawable.livemusic;  // Replace with your drawable resource ID
+
+        button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
+        button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
+        button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background_ent_main));
+
+
+        int heightInDp = 80; // Height in dp
+        float scale = getResources().getDisplayMetrics().density;
+        int heightInPx = (int) (heightInDp * scale + 0.5f);
+// Setting margins
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT, heightInPx);
+        layoutParams.setMargins(margin, 0, margin, 55);
         button.setLayoutParams(layoutParams);
 
 // Add the button to your layout
@@ -567,8 +674,9 @@ public class Myactivity extends AppCompatActivity {
                             public void run() {
 
                             initnav(somebits);
+                                ent();
                                 islandtour();
-                                gohome();
+                                //gohome();
                                 needhelp();
                             }
                         });
