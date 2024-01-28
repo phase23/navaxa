@@ -317,7 +317,10 @@ public class Loadmaps extends FragmentActivity implements OnMapReadyCallback,Goo
         //mMap.addMarker(new MarkerOptions().position(destination).title("DEST"));
 
         mMap.moveCamera(CameraUpdateFactory.newLatLng(anguilla));
-        mMap.animateCamera( CameraUpdateFactory.zoomTo( 12.0f ) );
+        mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mydoublelat,mydoublelon), 12.0f), 4000, null);
+
+
+        // mMap.animateCamera( CameraUpdateFactory.zoomTo( 12.0f ) );
         //  mMap.animateCamera(CameraUpdateFactory.newLatLngZoom(new LatLng(mydoublelat,mydoublelon), 16.0f), 4000, null);
     }
 

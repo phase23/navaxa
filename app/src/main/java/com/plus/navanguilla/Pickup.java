@@ -148,11 +148,11 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
         SharedPreferences shared = getSharedPreferences("autoLogin", MODE_PRIVATE);
         SharedPreferences.Editor prefsEditor = shared.edit();
         handler2 = new Handler(Looper.getMainLooper());
-
+        justhelper.setBrightness(this, 75); // Sets brightness to 75%
 
 
         ll = (LinearLayout) findViewById(R.id.topbar);
-        ll.setAlpha(0.5f);
+        ll.setAlpha(0.9f);
 
         itemid = getIntent().getExtras().getString("itemid","defaultKey");
         prec = getIntent().getExtras().getString("preclass","defaultKey");
@@ -475,7 +475,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
         String thisdevice = Settings.Secure.getString(this.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
 
-        String url = "https://xcape.ai/navigation/loadwaymarkers.php?general=1";
+        String url = "https://xcape.ai/navigation/loadwaymarkers.php?type=general";
         Log.i("action url",url);
         OkHttpClient client = new OkHttpClient();
         RequestBody requestBody = new MultipartBody.Builder()

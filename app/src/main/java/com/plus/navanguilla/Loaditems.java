@@ -273,7 +273,7 @@ public class Loaditems extends AppCompatActivity {
 
                 // Extracting data from JSON object
                 String placeId = jsonObject.getString("placeid");
-                String whichSite = jsonObject.getString("whichsite").trim();
+                 String whichSite = jsonObject.getString("whichsite").trim();
                 double distance = jsonObject.getDouble("distance");
                 String formattedDistance = String.format("%.2f", distance);
                 String buttonText;
