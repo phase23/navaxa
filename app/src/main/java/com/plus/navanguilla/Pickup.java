@@ -470,7 +470,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
 
     }
 
-    public String getwaymarkers(){
+    public String   getwaymarkers(){
 
         String thisdevice = Settings.Secure.getString(this.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
