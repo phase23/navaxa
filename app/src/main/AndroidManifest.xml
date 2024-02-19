@@ -29,7 +29,22 @@
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
-        android:theme="@style/Theme.NavAnguilla">
+        android:theme="@style/AppTheme.NoActionBar">
+        <activity
+            android:name=".Contactus"
+            android:exported="false" />
+        <activity
+            android:name=".Nointernet"
+            android:exported="false" />
+        <activity
+            android:name=".Nopermission"
+            android:exported="false" />
+        <activity
+            android:name=".Locationyes"
+            android:exported="false" />
+        <activity
+            android:name=".Disclosure"
+            android:exported="false" />
         <activity
             android:name=".Loadevents"
             android:exported="false" />
@@ -53,14 +68,14 @@
              You need a different API key for each encryption key, including the release key that is used to
              sign the APK for publishing.
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
-  -->
-        <receiver android:name=".BootReceiver"
+        -->
+        <receiver
+            android:name=".BootReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
-
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
@@ -80,13 +95,11 @@
             android:screenOrientation="portrait">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
+
                 <category android:name="android.intent.category.HOME" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
-
         </activity>
-
 
         <service
             android:name=".Myservice"

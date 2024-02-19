@@ -3,18 +3,24 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/button_background_res.xml" value="0.1" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/rounded_button_background.xml" value="0.1203125" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/rounded_button_background_beach.xml" value="0.1203125" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/rounded_button_background_ent.xml" value="0.1" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/rounded_button_background_ent_main.xml" value="0.1" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/rounded_button_background_food.xml" value="0.1203125" />
+        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_contactus.xml" value="0.33" />
+        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_disclosure.xml" value="0.25" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_islandtour.xml" value="0.12864583333333332" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_loadactivity.xml" value="0.15208333333333332" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_loadevents.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_loaditems.xml" value="0.22" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_loadmaps.xml" value="0.10833333333333334" />
+        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_locationyes.xml" value="0.25" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_main.xml" value="0.18541666666666667" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_myactivity.xml" value="0.33" />
+        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_nointernet.xml" value="0.18229166666666666" />
+        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_nopermission.xml" value="0.18229166666666666" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_pickup.xml" value="0.18" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_renturnhome.xml" value="0.1" />
       </map>

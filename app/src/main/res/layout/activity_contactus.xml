@@ -4,7 +4,7 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".Loadevents">
+    tools:context=".Contactus">
 
     <LinearLayout android:id="@+id/wrapper"
         android:layout_width="match_parent"
@@ -22,7 +22,7 @@
 
 
             <Button
-                android:id="@+id/backmain"
+                android:id="@+id/backtomain"
                 android:layout_width="100dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="right"
@@ -61,46 +61,40 @@
 
 
 
-
-
-
         <LinearLayout
-            android:id="@+id/scnf"
+            android:id="@+id/logoholder"
             android:orientation="vertical"
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
+            android:layout_height="match_parent"
+            android:gravity="center_horizontal|center_vertical"> <!-- This centers content both horizontally and vertically -->
 
+            <ImageView
+                android:id="@+id/logo"
+                android:layout_width="250dp"
+                android:layout_height="250dp"
+                android:src="@drawable/xlogo"
+                android:layout_gravity="center" /> <!-- This centers the ImageView in the LinearLayout -->
 
-            <com.github.ybq.android.spinkit.SpinKitView
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                android:id="@+id/spin_kit"
-                style="@style/SpinKitView.Small.CubeGrid"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                app:SpinKit_Color="@color/black" />
+        </LinearLayout>
 
+        <LinearLayout
+            android:id="@+id/textholder"
+            android:orientation="vertical"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:gravity="center"> <!-- This centers content both horizontally and vertically -->
 
             <TextView
-                android:id="@+id/loadingtext"
-                android:layout_width="match_parent"
+                android:id="@+id/helptxt"
+                android:layout_width="268dp"
                 android:layout_height="wrap_content"
-                android:layout_alignParentTop="false"
-                android:layout_alignParentEnd="true"
-                android:layout_alignParentRight="false"
                 android:layout_gravity="center"
-                android:gravity="center"
-                android:paddingTop="25dp"
-                android:paddingRight="20dp"
-                android:text="Loading Please wait..."
+                android:paddingLeft="25dp"
+                android:paddingTop="15dp"
+                android:paddingRight="25dp"
+                android:text="For any suggestions, feedback, or questions you may have, please don't hesitate to reach out to us.\n\nYour insights are invaluable as they help us improve our services and ensure we're meeting your needs and expectations.\n\n You can contact us on support@xcape.ai"
                 android:textSize="14dp"
-                android:textStyle="bold"
-                tools:layout_editor_absoluteX="112dp"
-                tools:layout_editor_absoluteY="112dp" />
-
-
-
-
+                android:textStyle="bold" />
 
 
         </LinearLayout>
@@ -108,7 +102,5 @@
 
 
     </LinearLayout>
-
-
 
 </ScrollView>

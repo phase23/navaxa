@@ -18,9 +18,10 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
-            android:layout_marginBottom="65dp"
-            android:text="Select Your Activity"
-            android:textSize="26sp"
+            android:layout_marginTop="20dp"
+            android:layout_marginBottom="30dp"
+            android:text="Choose your destination"
+            android:textSize="15sp"
             android:textStyle="bold" />
 
         <!-- Container for dynamically added content -->

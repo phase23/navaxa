@@ -126,10 +126,12 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
     Button prvieworders;
     Button startroutex;
     String itemid;
+    String placeid;
     private boolean isTTSInitialized = false;
     private TextToSpeech tts;
     private static final float BEARING_TOLERANCE = 20;
     String theroute;
+    Boolean playedalready = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -173,6 +175,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
 
 
         theroute = getIntent().getExtras().getString("theroute");
+        placeid = getIntent().getExtras().getString("placeid");
         // String theroute = getroute(cunq, thisorderid);
 
         getback = (Button)findViewById(R.id.dialcustomer);
@@ -309,7 +312,8 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
             // Optionally set language, pitch, etc.
             float speechRate = 0.7f; // 50% of the normal speech rate
             //tts.setSpeechRate(speechRate);
-            tts.speak("Proceed to the route, please remember to keep left", TextToSpeech.QUEUE_FLUSH, null, null);
+            String thislocation = getendlocation(placeid);
+            tts.speak("Proceed to the route, please remember to keep left, navigating to " + thislocation, TextToSpeech.QUEUE_FLUSH, null, null);
         } else {
             // Initialization failed
         }
@@ -506,6 +510,46 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
 
 
     }
+
+
+    public String getendlocation(String itemid){
+
+        String thisdevice = Settings.Secure.getString(this.getContentResolver(),
+                Settings.Secure.ANDROID_ID);
+
+        String url = "https://xcape.ai/navigation/getendlocation.php?id=" + itemid;
+        Log.i("action url",url);
+        OkHttpClient client = new OkHttpClient();
+        RequestBody requestBody = new MultipartBody.Builder()
+                .setType(MultipartBody.FORM)
+
+                .addFormDataPart("what","this" )
+
+                .build();
+        Request request = new Request.Builder()
+                .url(url)//your webservice url
+                .post(requestBody)
+                .build();
+        try {
+            //String responseBody;
+            okhttp3.Response response = client.newCall(request).execute();
+            // Response response = client.newCall(request).execute();
+            if (response.isSuccessful()){
+                Log.i("SUCC",""+response.message());
+            }
+            String resp = response.message();
+            responseBody =  response.body().string();
+            Log.i("respBody:main",responseBody);
+            Log.i("MSG",resp);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return responseBody;
+
+
+    }
+
+
 
 
 
@@ -709,6 +753,37 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
                 System.out.println("Could not parse " + nfe);
             }
 
+
+            // destination
+            Double myddoublelat = 0.0;
+            try {
+                myddoublelat = Double.parseDouble(dmylat);
+            } catch(NumberFormatException nfe) {
+                System.out.println("Could not parse " + nfe);
+            }
+
+            Double myddoublelon = 0.0;
+            try {
+                myddoublelon = Double.parseDouble(dmylon);
+            } catch(NumberFormatException nfe) {
+                System.out.println("Could not parse " + nfe);
+            }
+
+
+
+            boolean isClose = isWithin20MetersOfDestination(mydoublelat, mydoublelon, myddoublelat, myddoublelon);
+            if(isClose) {
+                // You are within 20 meters of the destination
+                if(!playedalready){
+                    String endlocation = getendlocation(placeid);
+                    speak("You have arrived at you destination. " +endlocation);
+                 playedalready = true;
+                }
+            } else {
+                // You are more than 20 meters away from the destination
+            }
+
+
             //float tilt = 30; // This tilts the camera by 30 degrees
             LatLng currentlocation = new LatLng(mydoublelat, mydoublelon);
             checkProximityToWaypoints(currentlocation, thebearing,waypoints);
@@ -732,6 +807,11 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
 
             String nextroute = mydoublelat + "," + mydoublelon + "," + dmylat + "," + dmylon ;
 
+
+
+
+
+
             try {
                 sendforroute("https://xcape.ai/navigation/fetchroutedetails.php?location="+nextroute);
 
@@ -746,6 +826,24 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
 
         }
     };
+
+
+    public boolean isWithin20MetersOfDestination(double mydoublelat, double mydoublelon, double myddoublelat, double myddoublelon) {
+        // Create Location objects for the current location and the destination
+        Location currentLocation = new Location("currentLocation");
+        currentLocation.setLatitude(mydoublelat);
+        currentLocation.setLongitude(mydoublelon);
+
+        Location destinationLocation = new Location("destinationLocation");
+        destinationLocation.setLatitude(myddoublelat);
+        destinationLocation.setLongitude(myddoublelon);
+
+        // Calculate the distance between the current location and the destination
+        float distance = currentLocation.distanceTo(destinationLocation);
+
+        // Check if the distance is less than or equal to 20 meters
+        return distance <= 20;
+    }
 
 
     // Method to speak text

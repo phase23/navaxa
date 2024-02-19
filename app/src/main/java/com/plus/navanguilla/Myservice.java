@@ -36,7 +36,7 @@ public class Myservice extends Service {
         mContext=this;
 
 
-        Toast.makeText(this, "Service started", Toast.LENGTH_SHORT).show();
+      //  Toast.makeText(this, "Service started", Toast.LENGTH_SHORT).show();
         locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
 
         locationManager=(LocationManager) mContext.getSystemService(Context.LOCATION_SERVICE);
@@ -63,14 +63,14 @@ public class Myservice extends Service {
         try {
             if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                 locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, locationListener);
-                Toast.makeText(this, "Location listener is enabled", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "Location listener is enabled", Toast.LENGTH_SHORT).show();
             } else {
-                Toast.makeText(this, "GPS is disabled", Toast.LENGTH_SHORT).show();
+                //Toast.makeText(this, "GPS is disabled", Toast.LENGTH_SHORT).show();
             }
         } catch (SecurityException e) {
-            Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(this, "Location permission not granted", Toast.LENGTH_SHORT).show();
         } catch (IllegalArgumentException e) {
-            Toast.makeText(this, "GPS provider does not exist on this device", Toast.LENGTH_SHORT).show();
+           // Toast.makeText(this, "GPS provider does not exist on this device", Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -79,7 +79,7 @@ public class Myservice extends Service {
 
     @Override
     public void onStart(Intent intent, int startid) {
-        Toast.makeText(this, "Service started by user.", Toast.LENGTH_LONG).show();
+       // Toast.makeText(this, "Service started by user.", Toast.LENGTH_LONG).show();
 
     }
 

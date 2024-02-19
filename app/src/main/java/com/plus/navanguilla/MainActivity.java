@@ -15,6 +15,7 @@ import android.speech.tts.TextToSpeech;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.Toast;
@@ -34,6 +35,8 @@ import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import android.os.Handler;
+
 
 public class MainActivity extends AppCompatActivity   {
     Button finish;
@@ -43,17 +46,27 @@ public class MainActivity extends AppCompatActivity   {
 
     LocationManager locationManager;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
+    private final int SPLASH_DISPLAY_LENGTH = 3000; // Splash screen
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        getWindow().getDecorView().setSystemUiVisibility(uiOptions);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
         // Hide the status bar.
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
         // Hide the navigation bar.
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
+
+        setContentView(R.layout.activity_main);
+
 
 
         int SDK_INT = android.os.Build.VERSION.SDK_INT;
@@ -67,10 +80,16 @@ public class MainActivity extends AppCompatActivity   {
             //your codes here
 
         }
-
+/*
         if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{android.Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_PERMISSION_REQUEST_CODE);
         }
+
+
+
+
+*/
+        checkAndRequestPermissions();
 
         String globaldevice = Settings.Secure.getString(this.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
@@ -86,19 +105,9 @@ public class MainActivity extends AppCompatActivity   {
             e.printStackTrace();
         }
 
-        Intent i = new Intent(getApplicationContext(), Myservice.class);
-        getApplicationContext().startService(i);
+       // Intent i = new Intent(getApplicationContext(), Myservice.class);
+        //getApplicationContext().startService(i);
 
-        finish = (Button)findViewById(R.id.button);
-
-        finish.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, Myactivity.class);
-                startActivity(intent);
-
-            }
-        });
 
 
 
@@ -143,6 +152,51 @@ public class MainActivity extends AppCompatActivity   {
                 });
 
     }
+
+
+
+    private void checkAndRequestPermissions() {
+        if (!isLocationPermissionGranted() || !isGpsEnabled()) {
+            // If the location permission has not been granted, redirect to the disclosure page.
+            Intent activity = new Intent(getApplicationContext(), Disclosure.class);
+            startActivity(activity);
+        }else if (!NetworkUtil.isInternetAvailable(getApplicationContext()) ) {
+            Intent activity = new Intent(getApplicationContext(), Nointernet.class);
+            startActivity(activity);
+
+        }else{
+
+            new Handler().postDelayed(new Runnable() {
+                @Override
+                public void run() {
+                    // Create an Intent that will start the main activity.
+                    Intent i = new Intent(getApplicationContext(), Myservice.class);
+                    getApplicationContext().startService(i);
+
+                    Intent activity = new Intent(getApplicationContext(), Myactivity.class);
+                    startActivity(activity);
+                }
+            }, SPLASH_DISPLAY_LENGTH);
+
+
+
+
+
+
+        }
+    }
+
+
+    private boolean isGpsEnabled() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+
+    private boolean isLocationPermissionGranted() {
+        return ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
 
 
     @Override

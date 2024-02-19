@@ -144,11 +144,12 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
     LatLng source;
     LatLng mysource;
     String closestWaypointStr;
-    private static final float BEARING_TOLERANCE = 20; // 20 degrees tolerance
+       // 20 degrees tolerance
     private boolean isTTSInitialized = false;
     private TextToSpeech tts;
     private long lastSpokenTime = 0;
     private static final long COOLDOWN_PERIOD = 30000; // 30
+    private static final float BEARING_TOLERANCE = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -338,7 +339,7 @@ public class Islandtour extends FragmentActivity implements OnMapReadyCallback,G
             // Optionally set language, pitch, etc.
             float speechRate = 0.7f; // 50% of the normal speech rate
             //tts.setSpeechRate(speechRate);
-            tts.speak("Proceed to the route, please remember to keep left", TextToSpeech.QUEUE_FLUSH, null, null);
+            tts.speak("Follow to route to start your 45min tour", TextToSpeech.QUEUE_FLUSH, null, null);
         } else {
             // Initialization failed
         }

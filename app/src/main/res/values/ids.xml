@@ -1,0 +1,4 @@
+<resources>
+    <item name="tag_first" type="id"/>
+    <item name="tag_second" type="id"/>
+</resources>

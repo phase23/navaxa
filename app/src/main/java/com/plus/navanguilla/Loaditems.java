@@ -20,6 +20,7 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.github.ybq.android.spinkit.sprite.Sprite;
 import com.github.ybq.android.spinkit.style.DoubleBounce;
@@ -49,6 +50,8 @@ public class Loaditems extends AppCompatActivity {
     Button goback;
     String locationnow;
     String itemid;
+    String placeId;
+    String thistag;
     TextView loading;
     ProgressBar progressBar;
 
@@ -90,13 +93,15 @@ public class Loaditems extends AppCompatActivity {
         });
 
 
-         itemid = getIntent().getExtras().getString("list","defaultKey");
+        itemid = getIntent().getExtras().getString("list","defaultKey");
         Log.i("side",itemid);
 
-        if(itemid.equals("2") || itemid.equals("1") || itemid.equals("3") || itemid.equals("7") ) {
+        if(itemid.equals("2") || itemid.equals("1") || itemid.equals("3") || itemid.equals("7") || itemid.equals("5") || itemid.equals("4")  ) {
             loadlist("distance");
+            loading.setText("Sorting by distance .. loading");
         }else{
             loadlist("venue");
+            loading.setText("Sorting A to Z .. loading");
         }
 
 
@@ -154,7 +159,7 @@ public class Loaditems extends AppCompatActivity {
                 stringBuilder.append(line);
             }
 
-             locationnow = stringBuilder.toString();
+            locationnow = stringBuilder.toString();
             // Use the file contents as needed
             // Uncomment the line below to display a toast message with the content
             // Toast.makeText(getApplicationContext(), "Serlat: " + locationnow, Toast.LENGTH_LONG).show();
@@ -222,13 +227,13 @@ public class Loaditems extends AppCompatActivity {
                             @Override
                             public void run() {
                                 if(itemid.equals("1")) {
-                                    beachbutton();
+                                    //fbeachbutton();
 
 
-                            }else if(itemid.equals("4")){
-                                    callofficebutton();
+                                }else if(itemid.equals("4")){
+                                    //callofficebutton();
                                     callpolicebutton();
-                            }
+                                }
 
 
 
@@ -272,25 +277,31 @@ public class Loaditems extends AppCompatActivity {
                 JSONObject jsonObject = jsonArray.getJSONObject(i);
 
                 // Extracting data from JSON object
-                String placeId = jsonObject.getString("placeid");
-                 String whichSite = jsonObject.getString("whichsite").trim();
+                placeId = jsonObject.getString("placeid");
+                String whichSite = jsonObject.getString("whichsite").trim();
+                String phone = jsonObject.getString("phone").trim();
                 double distance = jsonObject.getDouble("distance");
+                String thisplace = jsonObject.getString("thisplace");
+
                 String formattedDistance = String.format("%.2f", distance);
                 String buttonText;
                 String onwhichSite = toSentenceCase(whichSite);
-                        Log.i("wsite",whichSite);
+                Log.i("wsite",whichSite);
+
                 if(whichSite.equals("Monday")){
-                     buttonText = whichSite + " ";
+                    buttonText = whichSite + " ";
                 } else {
                     // Creating button text
-                     buttonText = onwhichSite + "\n" + formattedDistance + " Miles";
+                    buttonText = onwhichSite + "\n" + formattedDistance + " Miles";
                 }
                 // Create a button
                 Button button = new Button(this);
                 button.setTag(placeId);  // Set placeId as tag
+                button.setTag(R.id.tag_first, phone);
+                button.setTag(R.id.tag_second, thisplace);
                 button.setText(buttonText);
                 //button.setTransformationMethod(null);
-               //button.setAllCaps(false);
+                //button.setAllCaps(false);
                 // Add an OnClickListener to handle button clicks
                 button.setOnClickListener(new View.OnClickListener() {
                     @Override
@@ -298,26 +309,63 @@ public class Loaditems extends AppCompatActivity {
 
                         AlertDialog.Builder dialog = new AlertDialog.Builder(Loaditems.this);
                         dialog.setCancelable(false);
-                        dialog.setTitle("Please Confirm");
-                        dialog.setMessage("Are you sure you want start this route?");
-                        dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                            String thisaction;
+                            String thiscancel;
+                        if(itemid.equals("2")){
+
+                            String thisplace = (String) button.getTag(R.id.tag_second);
+                            dialog.setTitle(thisplace);
+                            dialog.setMessage("Reserve a table or start navigation");
+                            thisaction = "Start";
+                            thiscancel = "Cancel";
+
+                            dialog.setNeutralButton("Reserve table", new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    // Code to execute on "Info"
+                                    String thisphone = (String) button.getTag(R.id.tag_first);
+                                    //Toast.makeText(getApplicationContext(), "phone " + thisphone, Toast.LENGTH_SHORT).show();
+
+                                    Uri number = Uri.parse("tel:" +thisphone);
+                                    Intent callIntent = new Intent(Intent.ACTION_DIAL, number);
+                                    startActivity(callIntent);
+
+                                }
+                            });
+
+
+
+
+                        }else {
+                            dialog.setTitle("Start Navigation");
+                            dialog.setMessage("Are you sure you want start this route?");
+                            thisaction = "Yes";
+                            thiscancel = "No";
+
+                        }
+
+
+                        dialog.setPositiveButton(thisaction, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
 
-
-                                gettheroutes(placeId);
+                                thistag = (String) button.getTag();
+                                gettheroutes(thistag);
 
 
                                 dialog.dismiss();
                             }
                         })
-                                .setNegativeButton("No ", new DialogInterface.OnClickListener() {
+                                .setNegativeButton(thiscancel, new DialogInterface.OnClickListener() {
                                     @Override
                                     public void onClick(DialogInterface dialog, int which) {
                                         //Action for "Cancel".
                                         dialog.dismiss();
                                     }
                                 });
+
+
+
 
                         final AlertDialog alert = dialog.create();
                         alert.show();
@@ -330,7 +378,7 @@ public class Loaditems extends AppCompatActivity {
                 LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 buttonParams.height = 80;  // adjust this value to your liking
-                button.setTextSize(25);  // adjust this value to your liking
+                button.setTextSize(14);  // adjust this value to your liking
                 int padding = 20;  // adjust this value to your liking
                 button.setPadding(padding, padding, padding, padding);
 
@@ -438,7 +486,7 @@ public class Loaditems extends AppCompatActivity {
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonParams.height = 80;  // adjust this value to your liking
-        button.setTextSize(25);  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
         int padding = 20;  // adjust this value to your liking
         button.setPadding(padding, padding, padding, padding);
 
@@ -475,6 +523,10 @@ public class Loaditems extends AppCompatActivity {
         Button button = new Button(this);
         button.setTag("1");
         button.setText("Call Police");
+        button.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+        button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background_res));
+
+
 
         // Add an OnClickListener to handle button clicks
         button.setOnClickListener(new View.OnClickListener() {
@@ -495,7 +547,7 @@ public class Loaditems extends AppCompatActivity {
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonParams.height = 80;  // adjust this value to your liking
-        button.setTextSize(25);  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
         int padding = 20;  // adjust this value to your liking
         button.setPadding(padding, padding, padding, padding);
 
@@ -557,7 +609,7 @@ public class Loaditems extends AppCompatActivity {
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonParams.height = 80;  // adjust this value to your liking
-        button.setTextSize(25);  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
         int padding = 20;  // adjust this value to your liking
         button.setPadding(padding, padding, padding, padding);
 
@@ -594,6 +646,10 @@ public class Loaditems extends AppCompatActivity {
         Button button = new Button(this);
         button.setTag("99999");//so not removed
         button.setText("Initializing..");
+        button.setTextColor(ContextCompat.getColor(this, android.R.color.white));
+
+        button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background_res));
+
 
         new Handler(Looper.getMainLooper()).postDelayed(new Runnable() {
             @Override
@@ -614,10 +670,13 @@ public class Loaditems extends AppCompatActivity {
                     button.setTag("99998");
                     button.setText("Sort by Distance");
                     loadlist("venue");
+                    loading.setText("Sorting A to Z .. loading");
                 }else if(tag.equals("99998")){
                     button.setTag("99999");
                     button.setText("Sort List A - Z");
                     loadlist("distance");
+                    loading.setText("Sorting by distance .. loading");
+
                 }
 
 
@@ -630,7 +689,7 @@ public class Loaditems extends AppCompatActivity {
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonParams.height = 80;  // adjust this value to your liking
-        button.setTextSize(25);  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
         int padding = 20;  // adjust this value to your liking
         button.setPadding(padding, padding, padding, padding);
 
@@ -641,7 +700,7 @@ public class Loaditems extends AppCompatActivity {
 
         drawableLeft = R.drawable.eatmap;  // Replace with your drawable resource ID
 
-        button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
+       // button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
         button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
 
 // Setting margins
@@ -690,7 +749,7 @@ public class Loaditems extends AppCompatActivity {
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonParams.height = 80;  // adjust this value to your liking
-        button.setTextSize(25);  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
         int padding = 20;  // adjust this value to your liking
         button.setPadding(padding, padding, padding, padding);
 
@@ -720,7 +779,7 @@ public class Loaditems extends AppCompatActivity {
 
 
 
-    public void  gettheroutes(String placeid){
+    public void  gettheroutes(String thisplace){
 
 
 
@@ -728,8 +787,8 @@ public class Loaditems extends AppCompatActivity {
 
         try {
 
-            System.out.println("https://xcape.ai/navigation/getroute.php?&id=" + placeid );
-            returnroute("https://xcape.ai/navigation/getroute.php?&id=" + placeid );
+            System.out.println("https://xcape.ai/navigation/getroute.php?&id=" + thisplace );
+            returnroute("https://xcape.ai/navigation/getroute.php?&id=" + thisplace );
 
         } catch (IOException e) {
             e.printStackTrace();
@@ -777,6 +836,7 @@ public class Loaditems extends AppCompatActivity {
 
                         Intent activity = new Intent(getApplicationContext(), Pickup.class);
                         activity.putExtra("itemid",itemid);
+                        activity.putExtra("placeid",thistag);
                         activity.putExtra("theroute",routenow);
                         startActivity(activity);
 

@@ -1,14 +1,17 @@
 package com.plus.navanguilla;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.app.AlertDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.graphics.Typeface;
+import android.location.LocationManager;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.os.Handler;
@@ -17,6 +20,7 @@ import android.provider.Settings;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -51,21 +55,25 @@ public class Myactivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        requestWindowFeature(Window.FEATURE_NO_TITLE);
+        int uiOptions = View.SYSTEM_UI_FLAG_LAYOUT_STABLE
+                | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
+                | View.SYSTEM_UI_FLAG_FULLSCREEN;
+        getWindow().getDecorView().setSystemUiVisibility(uiOptions);
+
+
         setContentView(R.layout.activity_myactivity);
         handler2 = new Handler(Looper.getMainLooper());
 
         final LinearLayout layout = findViewById(R.id.scnf);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        // Hide the status bar.
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
-
-        // Hide the navigation bar.
-        getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         audioManager.setStreamVolume(AudioManager.STREAM_MUSIC, maxVolume, 0);
+
+
 
         justhelper.setBrightness(this, 75); // Sets brightness to 75%
 
@@ -88,6 +96,42 @@ public class Myactivity extends AppCompatActivity {
 
 
     }
+
+
+    private void checkAndRequestPermissions(String tag) {
+        if (!isLocationPermissionGranted() || !isGpsEnabled()) {
+            // If the location permission has not been granted, redirect to the disclosure page.
+            Intent activity = new Intent(getApplicationContext(), Nopermission.class);
+            startActivity(activity);
+
+        }else {
+
+            if(tag.equals("5")){ //entertainment
+                Intent intent = new Intent(getApplicationContext(), Loadevents.class);
+                intent.putExtra("list", tag);
+                startActivity(intent);
+
+            }else {
+                Intent intent = new Intent(getApplicationContext(), Loaditems.class);
+                intent.putExtra("list", tag);
+                startActivity(intent);
+            }
+        }
+
+    }
+
+
+
+    private boolean isGpsEnabled() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+
+    private boolean isLocationPermissionGranted() {
+        return ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
 
 
     public void initnav(String json) {
@@ -119,9 +163,8 @@ public class Myactivity extends AppCompatActivity {
                        String  tag = (String) view.getTag();
                         // You can use the tag (index) to identify which button was clicked.
 
-                        Intent intent = new Intent(getApplicationContext(), Loaditems.class);
-                        intent.putExtra("list",tag);
-                        startActivity(intent);
+                        checkAndRequestPermissions(tag);
+
 
                     }
                 });
@@ -131,13 +174,14 @@ public class Myactivity extends AppCompatActivity {
                 LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 buttonParams.height = 80;  // adjust this value to your liking
-                button.setTextSize(25);  // adjust this value to your liking
+                button.setTextSize(14);  // adjust this value to your liking
                 int padding = 20;  // adjust this value to your liking
                 button.setPadding(padding, padding, padding, padding);
 
                 // Aligning text to the left and adding an image
                 button.setGravity(Gravity.START);  // This aligns the text to the left
                 int drawableLeft;
+
                // Log.i("side",tag);
                 if(key.equals("1")) {
                      drawableLeft = R.drawable.beach;  // Replace with your drawable resource ID
@@ -318,7 +362,7 @@ public class Myactivity extends AppCompatActivity {
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonParams.height = 80;  // adjust this value to your liking
-        button.setTextSize(25);  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
         int padding = 20;  // adjust this value to your liking
         button.setPadding(padding, padding, padding, padding);
 
@@ -348,6 +392,68 @@ public class Myactivity extends AppCompatActivity {
     }
 
 
+
+
+
+
+    private void contact(){
+        int totalWidth = getResources().getDisplayMetrics().widthPixels;
+        int margin = (int) (totalWidth * 0.10);  // 30% of screen width
+
+        /* Button  new start here */
+        Button button = new Button(this);
+        button.setTag("1");
+        button.setText("Feedback");
+
+        // Add an OnClickListener to handle button clicks
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Handle button click here
+                String  tag = (String) view.getTag();
+
+
+                        Intent activity = new Intent(getApplicationContext(), Contactus.class);
+                        startActivity(activity);
+
+
+
+            }
+        });
+
+
+        // Setting button height
+        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        buttonParams.height = 80;  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
+        int padding = 20;  // adjust this value to your liking
+        button.setPadding(padding, padding, padding, padding);
+
+        // Aligning text to the left and adding an image
+        button.setGravity(Gravity.START);  // This aligns the text to the left
+        int drawableLeft;
+        // Log.i("side",tag);
+
+        drawableLeft = R.drawable.feedback;  // Replace with your drawable resource ID
+
+        button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
+        button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
+        button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background));
+
+// Setting margins
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(margin, 0, margin, 55);
+        button.setLayoutParams(layoutParams);
+
+// Add the button to your layout
+        LinearLayout linearLayout = findViewById(R.id.scnf); // Replace with your layout ID
+        linearLayout.addView(button);
+
+        /* Button New End Here */
+
+    }
 
 
 
@@ -435,7 +541,7 @@ public class Myactivity extends AppCompatActivity {
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonParams.height = 80;  // adjust this value to your liking
-        button.setTextSize(25);  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
         int padding = 20;  // adjust this value to your liking
         button.setPadding(padding, padding, padding, padding);
 
@@ -481,10 +587,12 @@ public class Myactivity extends AppCompatActivity {
                 String  tag = (String) view.getTag();
                 // You can use the tag (index) to identify which button was clicked.
 
+                checkAndRequestPermissions("4");
+                /*
                 Intent intent = new Intent(getApplicationContext(), Loaditems.class);
                 intent.putExtra("list","4");
                 startActivity(intent);
-
+                    */
             }
         });
 
@@ -494,7 +602,7 @@ public class Myactivity extends AppCompatActivity {
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonParams.height = 80;  // adjust this value to your liking
-        button.setTextSize(25);  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
         int padding = 20;  // adjust this value to your liking
         button.setPadding(padding, padding, padding, padding);
 
@@ -541,9 +649,11 @@ public class Myactivity extends AppCompatActivity {
                 String  tag = (String) view.getTag();
                 // You can use the tag (index) to identify which button was clicked.
 
-                Intent intent = new Intent(getApplicationContext(), Loadevents.class);
-                intent.putExtra("list","5");
-                startActivity(intent);
+                checkAndRequestPermissions("5");
+
+                //Intent intent = new Intent(getApplicationContext(), Loadevents.class);
+                //intent.putExtra("list","5");
+               // startActivity(intent);
 
             }
         });
@@ -554,7 +664,7 @@ public class Myactivity extends AppCompatActivity {
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonParams.height = 80;  // adjust this value to your liking
-        button.setTextSize(25);  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
         int padding = 20;  // adjust this value to your liking
         button.setPadding(padding, padding, padding, padding);
 
@@ -678,6 +788,7 @@ public class Myactivity extends AppCompatActivity {
                                 islandtour();
                                 //gohome();
                                 needhelp();
+                                contact();
                             }
                         });
 

@@ -1,11 +1,15 @@
 package com.plus.navanguilla;
 
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.app.AlertDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
@@ -48,6 +52,7 @@ public class Loadevents extends AppCompatActivity {
     Button goback;
     String locationnow;
     String itemid;
+    String thistag;
     TextView loading;
     ProgressBar progressBar;
 
@@ -61,7 +66,7 @@ public class Loadevents extends AppCompatActivity {
 
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
         // Hide the status bar.
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN);
 
@@ -208,6 +213,37 @@ public class Loadevents extends AppCompatActivity {
 
     }
 
+
+
+    private void checkAndRequestPermissions() {
+        if (!isLocationPermissionGranted() || !isGpsEnabled()) {
+            // If the location permission has not been granted, redirect to the disclosure page.
+            Intent activity = new Intent(getApplicationContext(), Nopermission.class);
+            startActivity(activity);
+
+        }else {
+
+            gettheroutes(thistag);
+
+
+        }
+
+    }
+
+
+
+    private boolean isGpsEnabled() {
+        LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+        return locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+    }
+
+
+    private boolean isLocationPermissionGranted() {
+        return ActivityCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED;
+    }
+
+
+
     public void othernav(String json) {
         int totalWidth = getResources().getDisplayMetrics().widthPixels;
         int margin = (int) (totalWidth * 0.10);  // 30% of screen width
@@ -248,15 +284,15 @@ public class Loadevents extends AppCompatActivity {
 
                         AlertDialog.Builder dialog = new AlertDialog.Builder(Loadevents.this);
                         dialog.setCancelable(false);
-                        dialog.setTitle("Return");
+                        dialog.setTitle("Start Navigation");
                         dialog.setMessage("Are you sure you want start this route?");
                         dialog.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int id) {
 
-
-                                gettheroutes(placeId);
-
+                                thistag = (String) button.getTag();
+                                //gettheroutes(thistag);
+                                checkAndRequestPermissions();
 
                                 dialog.dismiss();
                             }
@@ -280,7 +316,7 @@ public class Loadevents extends AppCompatActivity {
                 LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                         LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
                 buttonParams.height = 80;  // adjust this value to your liking
-                button.setTextSize(25);  // adjust this value to your liking
+                button.setTextSize(14);  // adjust this value to your liking
                 int padding = 20;  // adjust this value to your liking
                 button.setPadding(padding, padding, padding, padding);
 
@@ -370,7 +406,7 @@ public class Loadevents extends AppCompatActivity {
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonParams.height = 80;  // adjust this value to your liking
-        button.setTextSize(25);  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
         int padding = 20;  // adjust this value to your liking
         button.setPadding(padding, padding, padding, padding);
 
@@ -427,7 +463,7 @@ public class Loadevents extends AppCompatActivity {
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonParams.height = 80;  // adjust this value to your liking
-        button.setTextSize(25);  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
         int padding = 20;  // adjust this value to your liking
         button.setPadding(padding, padding, padding, padding);
 
@@ -489,7 +525,7 @@ public class Loadevents extends AppCompatActivity {
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonParams.height = 80;  // adjust this value to your liking
-        button.setTextSize(25);  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
         int padding = 20;  // adjust this value to your liking
         button.setPadding(padding, padding, padding, padding);
 
@@ -549,7 +585,7 @@ public class Loadevents extends AppCompatActivity {
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonParams.height = 80;  // adjust this value to your liking
-        button.setTextSize(25);  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
         int padding = 20;  // adjust this value to your liking
         button.setPadding(padding, padding, padding, padding);
 
@@ -609,7 +645,7 @@ public class Loadevents extends AppCompatActivity {
         LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
         buttonParams.height = 80;  // adjust this value to your liking
-        button.setTextSize(25);  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
         int padding = 20;  // adjust this value to your liking
         button.setPadding(padding, padding, padding, padding);
 
@@ -697,7 +733,9 @@ public class Loadevents extends AppCompatActivity {
                         Intent activity = new Intent(getApplicationContext(), Pickup.class);
                         activity.putExtra("itemid",itemid);
                         activity.putExtra("theroute",routenow);
+                        activity.putExtra("placeid",thistag);
                         activity.putExtra("preclass","1");
+
                         startActivity(activity);
 
 
