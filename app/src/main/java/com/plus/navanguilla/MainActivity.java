@@ -6,6 +6,7 @@ import androidx.core.content.ContextCompat;
 
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
@@ -24,7 +25,7 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.plus.navanguilla.util.DirectionPointListener;
 import com.plus.navanguilla.util.TourPointListener;
-
+import com.google.firebase.analytics.FirebaseAnalytics;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -36,13 +37,19 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 import android.os.Handler;
+import com.android.installreferrer.api.InstallReferrerClient;
+import com.android.installreferrer.api.InstallReferrerStateListener;
+import com.android.installreferrer.api.ReferrerDetails;
+import android.os.RemoteException;
+
+
 
 
 public class MainActivity extends AppCompatActivity   {
     Button finish;
     String somebits;
-
-
+    private     FirebaseAnalytics firebaseAnalytics;
+    String globaldevice;
 
     LocationManager locationManager;
     private static final int LOCATION_PERMISSION_REQUEST_CODE = 100;
@@ -66,6 +73,12 @@ public class MainActivity extends AppCompatActivity   {
         getWindow().getDecorView().setSystemUiVisibility(View.SYSTEM_UI_FLAG_HIDE_NAVIGATION);
 
         setContentView(R.layout.activity_main);
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
+
+
+
 
 
 
@@ -91,7 +104,7 @@ public class MainActivity extends AppCompatActivity   {
 */
         checkAndRequestPermissions();
 
-        String globaldevice = Settings.Secure.getString(this.getContentResolver(),
+         globaldevice = Settings.Secure.getString(this.getContentResolver(),
                 Settings.Secure.ANDROID_ID);
 
         createLocationFile();
@@ -113,7 +126,136 @@ public class MainActivity extends AppCompatActivity   {
 
 
 
+
+
+        // Initialize the Install Referrer Client
+        InstallReferrerClient referrerClient = InstallReferrerClient.newBuilder(this).build();
+        connectReferrerClient(referrerClient);
+
+
     }
+
+    private void connectReferrerClient(InstallReferrerClient referrerClient) {
+        referrerClient.startConnection(new InstallReferrerStateListener() {
+
+            @Override
+            public void onInstallReferrerSetupFinished(int responseCode) {
+                switch (responseCode) {
+                    case InstallReferrerClient.InstallReferrerResponse.OK:
+                        // Connection established
+                        try {
+                            ReferrerDetails response = referrerClient.getInstallReferrer();
+                            String referrerUrl = response.getInstallReferrer();
+                            long referrerClickTime = response.getReferrerClickTimestampSeconds();
+                            long appInstallTime = response.getInstallBeginTimestampSeconds();
+                            boolean instantExperienceLaunched = response.getGooglePlayInstantParam();
+                            Log.i("url",referrerUrl);
+                            // Use the referrer URL as needed for your tracking
+                            // Log or process the referrer details as required
+                            // Remember to parse the URL to extract the UTM parameters
+
+                            if (isFirstTimeLaunch()) {
+                                // This is the first time launch
+                                // Do something such as showing a welcome screen or tutorial
+                                Bundle bundle = new Bundle();
+                                bundle.putString(FirebaseAnalytics.Param.ITEM_ID,referrerUrl);
+                                firebaseAnalytics.logEvent("QRPATH",bundle);
+
+
+
+
+                                try {
+
+                                    sendreferer("https://xcape.ai/navigation/refererr.php?os=android&device="+globaldevice+"&path="+referrerUrl);
+
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+
+
+
+
+
+
+                            } //end fisttime
+
+
+                        } catch (RemoteException e) {
+                            e.printStackTrace();
+                        }
+                        break;
+                    case InstallReferrerClient.InstallReferrerResponse.FEATURE_NOT_SUPPORTED:
+                        // API not available on the current Play Store app
+                        break;
+                    case InstallReferrerClient.InstallReferrerResponse.SERVICE_UNAVAILABLE:
+                        // Connection couldn't be established
+                        break;
+                }
+            }
+
+            @Override
+            public void onInstallReferrerServiceDisconnected() {
+                // Try to reconnect or handle the disconnection appropriately
+            }
+        });
+    }
+
+
+    private boolean isFirstTimeLaunch() {
+        SharedPreferences prefs = getSharedPreferences("MyPrefs", MODE_PRIVATE);
+        // Check if we have the "FirstTimeLaunch" boolean in our prefs,
+        // defaulting to true if not found
+        boolean isFirstTime = prefs.getBoolean("FirstTimeLaunch", true);
+        if (isFirstTime) {
+            // If it's the first time, change the value to false
+            SharedPreferences.Editor editor = prefs.edit();
+            editor.putBoolean("FirstTimeLaunch", false);
+            editor.apply();
+        }
+        return isFirstTime;
+    }
+
+
+
+    void sendreferer(String url) throws IOException {
+        Request request = new Request.Builder()
+                .url(url)
+                .build();
+        Log.i("mydevice",url);
+        OkHttpClient client = new OkHttpClient();
+        client.newCall(request)
+                .enqueue(new Callback() {
+                    @Override
+                    public void onFailure(final Call call, IOException e) {
+                        Log.i("ddevice","errot"); // Error
+
+                        runOnUiThread(new Runnable() {
+                            @Override
+                            public void run() {
+                                // For the example, you can show an error dialog or a toast
+                                // on the main UI thread
+                            }
+                        });
+                    }
+
+                    @Override
+                    public void onResponse(Call call, final Response response) throws IOException {
+
+
+                        somebits = response.body().string();
+                        Log.i("ddevice",somebits);
+
+
+                    }//end if
+
+
+
+
+                });
+
+    }
+
+
 
     void senddevice(String url) throws IOException {
         Request request = new Request.Builder()

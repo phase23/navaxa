@@ -25,6 +25,8 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 
+import com.google.firebase.analytics.FirebaseAnalytics;
+
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -52,6 +54,8 @@ public class Myactivity extends AppCompatActivity {
     String key;
     String locationnow;
     String responseLocation;
+    private  FirebaseAnalytics firebaseAnalytics;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -68,6 +72,10 @@ public class Myactivity extends AppCompatActivity {
         handler2 = new Handler(Looper.getMainLooper());
 
         final LinearLayout layout = findViewById(R.id.scnf);
+
+
+        firebaseAnalytics = FirebaseAnalytics.getInstance(this);
+
 
         AudioManager audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         int maxVolume = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
@@ -97,6 +105,19 @@ public class Myactivity extends AppCompatActivity {
 
     }
 
+    private void logactivity( String item, String activity, String page ){
+
+        Log.i("action url",item + "/" + activity + "/" + page);
+
+        //Bundle bundle = new Bundle();
+        //bundle.putString(FirebaseAnalytics.Param.ITEM_ID, item);
+        //bundle.putString(FirebaseAnalytics.Param.ITEM_NAME, activity);
+        //bundle.putString(FirebaseAnalytics.Param.CONTENT_TYPE, page);
+        //firebaseAnalytics.logEvent(FirebaseAnalytics.Event.SELECT_CONTENT, bundle);
+
+
+    }
+
 
     private void checkAndRequestPermissions(String tag) {
         if (!isLocationPermissionGranted() || !isGpsEnabled()) {
@@ -106,11 +127,15 @@ public class Myactivity extends AppCompatActivity {
 
         }else {
 
-            if(tag.equals("5")){ //entertainment
+            if(tag.equals("9")) { //entertainment
                 Intent intent = new Intent(getApplicationContext(), Loadevents.class);
                 intent.putExtra("list", tag);
                 startActivity(intent);
 
+            }else if(tag.equals("8")) {
+                Intent intent = new Intent(getApplicationContext(), Loaddiscounts.class);
+                intent.putExtra("list", tag);
+                startActivity(intent);
             }else {
                 Intent intent = new Intent(getApplicationContext(), Loaditems.class);
                 intent.putExtra("list", tag);
@@ -153,6 +178,7 @@ public class Myactivity extends AppCompatActivity {
                 // Create a button with the index as a tag
                 Button button = new Button(this);
                 button.setTag(key);
+                button.setTag(R.id.tag_first, option);
                 button.setText(option);
 
                 // Add an OnClickListener to handle button clicks
@@ -161,8 +187,9 @@ public class Myactivity extends AppCompatActivity {
                     public void onClick(View view) {
                         // Handle button click here
                        String  tag = (String) view.getTag();
+                        String thisplace = (String) button.getTag(R.id.tag_first);
                         // You can use the tag (index) to identify which button was clicked.
-
+                        logactivity(tag,thisplace, "andriod");
                         checkAndRequestPermissions(tag);
 
 
@@ -179,7 +206,7 @@ public class Myactivity extends AppCompatActivity {
                 button.setPadding(padding, padding, padding, padding);
 
                 // Aligning text to the left and adding an image
-                button.setGravity(Gravity.START);  // This aligns the text to the left
+               button.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);  // This aligns the text to the left
                 int drawableLeft;
 
                // Log.i("side",tag);
@@ -367,7 +394,7 @@ public class Myactivity extends AppCompatActivity {
         button.setPadding(padding, padding, padding, padding);
 
         // Aligning text to the left and adding an image
-        button.setGravity(Gravity.START);  // This aligns the text to the left
+       button.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);  // This aligns the text to the left
         int drawableLeft;
         // Log.i("side",tag);
 
@@ -431,7 +458,7 @@ public class Myactivity extends AppCompatActivity {
         button.setPadding(padding, padding, padding, padding);
 
         // Aligning text to the left and adding an image
-        button.setGravity(Gravity.START);  // This aligns the text to the left
+       button.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);  // This aligns the text to the left
         int drawableLeft;
         // Log.i("side",tag);
 
@@ -546,7 +573,7 @@ public class Myactivity extends AppCompatActivity {
         button.setPadding(padding, padding, padding, padding);
 
         // Aligning text to the left and adding an image
-        button.setGravity(Gravity.START);  // This aligns the text to the left
+       button.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);  // This aligns the text to the left
         int drawableLeft;
         // Log.i("side",tag);
 
@@ -567,6 +594,67 @@ public class Myactivity extends AppCompatActivity {
         linearLayout.addView(button);
 
         /* Button New End Here */
+
+    }
+
+
+    private void discounts(){
+
+        int totalWidth = getResources().getDisplayMetrics().widthPixels;
+        int margin = (int) (totalWidth * 0.10);  // 30% of screen width
+
+        Button button = new Button(this);
+        button.setTag("1");
+        button.setText("Discounts");
+
+        // Add an OnClickListener to handle button clicks
+        button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                // Handle button click here
+                String  tag = (String) view.getTag();
+                // You can use the tag (index) to identify which button was clicked.
+
+                checkAndRequestPermissions("8");
+                /*
+                Intent intent = new Intent(getApplicationContext(), Loaditems.class);
+                intent.putExtra("list","4");
+                startActivity(intent);
+                    */
+            }
+        });
+
+
+
+        // Setting button height
+        LinearLayout.LayoutParams buttonParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        buttonParams.height = 80;  // adjust this value to your liking
+        button.setTextSize(14);  // adjust this value to your liking
+        int padding = 20;  // adjust this value to your liking
+        button.setPadding(padding, padding, padding, padding);
+
+        // Aligning text to the left and adding an image
+       button.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);  // This aligns the text to the left
+        int drawableLeft;
+        // Log.i("side",tag);
+
+        drawableLeft = R.drawable.couponoff;  // Replace with your drawable resource ID
+
+        button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
+        button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
+        button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background));
+
+// Setting margins
+        LinearLayout.LayoutParams layoutParams = new LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT);
+        layoutParams.setMargins(margin, 0, margin, 55);
+        button.setLayoutParams(layoutParams);
+
+// Add the button to your layout
+        LinearLayout linearLayout = findViewById(R.id.scnf); // Replace with your layout ID
+        linearLayout.addView(button);
+
 
     }
 
@@ -607,7 +695,7 @@ public class Myactivity extends AppCompatActivity {
         button.setPadding(padding, padding, padding, padding);
 
         // Aligning text to the left and adding an image
-        button.setGravity(Gravity.START);  // This aligns the text to the left
+       button.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);  // This aligns the text to the left
         int drawableLeft;
         // Log.i("side",tag);
 
@@ -649,7 +737,7 @@ public class Myactivity extends AppCompatActivity {
                 String  tag = (String) view.getTag();
                 // You can use the tag (index) to identify which button was clicked.
 
-                checkAndRequestPermissions("5");
+                checkAndRequestPermissions("9");
 
                 //Intent intent = new Intent(getApplicationContext(), Loadevents.class);
                 //intent.putExtra("list","5");
@@ -669,7 +757,7 @@ public class Myactivity extends AppCompatActivity {
         button.setPadding(padding, padding, padding, padding);
 
         // Aligning text to the left and adding an image
-        button.setGravity(Gravity.START);  // This aligns the text to the left
+       button.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);  // This aligns the text to the left
         int drawableLeft;
         // Log.i("side",tag);
 
@@ -786,6 +874,7 @@ public class Myactivity extends AppCompatActivity {
                             initnav(somebits);
                                 ent();
                                 islandtour();
+                                discounts();
                                 //gohome();
                                 needhelp();
                                 contact();

@@ -321,7 +321,7 @@ public class Loadevents extends AppCompatActivity {
                 button.setPadding(padding, padding, padding, padding);
 
 // Aligning text to the left and adding an image
-                button.setGravity(Gravity.START);  // This aligns the text to the left
+                button.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);
                 Log.i("ddevice",itemid); // Error
                 int drawableLeft;
 

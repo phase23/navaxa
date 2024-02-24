@@ -381,7 +381,7 @@ public class Loaditems extends AppCompatActivity {
                 button.setTextSize(14);  // adjust this value to your liking
                 int padding = 20;  // adjust this value to your liking
                 button.setPadding(padding, padding, padding, padding);
-
+                button.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);  // This aligns the text to the left
 // Aligning text to the left and adding an image
                 button.setGravity(Gravity.START);  // This aligns the text to the left
                 Log.i("ddevice",itemid); // Error
@@ -399,7 +399,7 @@ public class Loaditems extends AppCompatActivity {
                 }else if(itemid.equals("3")){
                     drawableLeft = R.drawable.mmpin;
                 }else if(itemid.equals("4")){
-                    drawableLeft = R.drawable.medicine;
+                    drawableLeft = R.drawable.hospitalabr;
                     button.setTextColor(Color.BLACK);
                     button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background_food));
 
@@ -427,10 +427,10 @@ public class Loaditems extends AppCompatActivity {
                     drawableLeft = R.drawable.pineat;
 
                 }
+                int drawableRight = R.drawable.chevron;
 
 
-
-                button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, 0, 0);
+                button.setCompoundDrawablesWithIntrinsicBounds(drawableLeft, 0, drawableRight, 0);
                 button.setCompoundDrawablePadding(10); // Optional, if you want padding between text and image
 
 // Setting margins
@@ -552,7 +552,7 @@ public class Loaditems extends AppCompatActivity {
         button.setPadding(padding, padding, padding, padding);
 
         // Aligning text to the left and adding an image
-        button.setGravity(Gravity.START);  // This aligns the text to the left
+        button.setGravity(Gravity.START | Gravity.CENTER_VERTICAL);  // This aligns the text to the left
         int drawableLeft;
         // Log.i("side",tag);
 

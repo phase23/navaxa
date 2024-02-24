@@ -842,7 +842,7 @@ public class Pickup extends FragmentActivity implements OnMapReadyCallback,Googl
         float distance = currentLocation.distanceTo(destinationLocation);
 
         // Check if the distance is less than or equal to 20 meters
-        return distance <= 20;
+        return distance <= 50;
     }
 
 
