@@ -24,8 +24,8 @@
 
     <TextView
         android:id="@+id/textView6"
-        android:layout_width="367dp"
-        android:layout_height="70dp"
+        android:layout_width="277dp"
+        android:layout_height="68dp"
         android:gravity="center"
         android:text="Looks like you do not have internet. Check and try again"
         android:textSize="14dp"
