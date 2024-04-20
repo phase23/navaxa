@@ -52,6 +52,7 @@ public class Loaditems extends AppCompatActivity {
     ProgressBar progressBar;
     String cid;
     String thiscountry;
+    String isinterest;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -285,6 +286,7 @@ public class Loaditems extends AppCompatActivity {
                 String phone = jsonObject.getString("phone").trim();
                 double distance = jsonObject.getDouble("distance");
                 String thisplace = jsonObject.getString("thisplace");
+                 isinterest = jsonObject.getString("isinterest");
 
                 String formattedDistance = String.format("%.2f", distance);
                 String buttonText;
@@ -302,6 +304,7 @@ public class Loaditems extends AppCompatActivity {
                 button.setTag(placeId);  // Set placeId as tag
                 button.setTag(R.id.tag_first, phone);
                 button.setTag(R.id.tag_second, thisplace);
+                button.setTag(R.id.tag_next, isinterest);
                 button.setText(buttonText);
                 //button.setTransformationMethod(null);
                 //button.setAllCaps(false);
@@ -310,19 +313,29 @@ public class Loaditems extends AppCompatActivity {
                     @Override
                     public void onClick(View view) {
 
+                        String thistagnext = (String) button.getTag(R.id.tag_next);
+
                         AlertDialog.Builder dialog = new AlertDialog.Builder(Loaditems.this);
                         dialog.setCancelable(false);
                             String thisaction;
                             String thiscancel;
-                        if(itemid.equals("2")){
-
+                        if(itemid.equals("2") || thistagnext.equals("1")){
+                            String msgtop;
+                            String msgbtm;
+                            if(thistagnext.equals("1")){
+                                msgtop = "Book Activity or start navigation";
+                                msgbtm = "Book Activity";
+                            }else{
+                                 msgtop = "Reserve a table or start navigation";
+                                msgbtm = "Reserve table";
+                            }
                             String thisplace = (String) button.getTag(R.id.tag_second);
                             dialog.setTitle(thisplace);
-                            dialog.setMessage("Reserve a table or start navigation");
+                            dialog.setMessage(msgtop);
                             thisaction = "Start";
                             thiscancel = "Cancel";
 
-                            dialog.setNeutralButton("Reserve table", new DialogInterface.OnClickListener() {
+                            dialog.setNeutralButton(msgbtm, new DialogInterface.OnClickListener() {
                                 @Override
                                 public void onClick(DialogInterface dialog, int which) {
                                     // Code to execute on "Info"
@@ -395,12 +408,22 @@ public class Loaditems extends AppCompatActivity {
                     button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background_beach));
 
                 }else if(itemid.equals("2")){
+
                     drawableLeft = R.drawable.pineat;
                     button.setTextColor(Color.BLACK);
                     button.setBackground(ContextCompat.getDrawable(this, R.drawable.rounded_button_background_food));
 
                 }else if(itemid.equals("3")){
-                    drawableLeft = R.drawable.mmpin;
+
+                    if(isinterest.equals("1")) {
+                        drawableLeft = R.drawable.outdoor;
+                    }else{
+                        drawableLeft = R.drawable.mmpin;
+                    }
+
+
+
+
                 }else if(itemid.equals("4")){
                     drawableLeft = R.drawable.hospitalabr;
                     button.setTextColor(Color.BLACK);
