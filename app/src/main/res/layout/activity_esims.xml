@@ -1,0 +1,83 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:padding="16dp"
+    android:background="@android:color/white">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:gravity="center_horizontal">
+
+        <!-- Back Button -->
+        <Button
+            android:id="@+id/backmain"
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_gravity="left"
+
+            android:layout_marginStart="1dp"
+            android:layout_marginLeft="1dp"
+
+            android:width="100dp"
+            android:gravity="center"
+            android:text="Back"
+            android:textColor="#020202"
+            android:visibility="visible"
+            app:backgroundTint="#FFFFFF" />
+
+        <!-- Header Image -->
+
+        <!-- Title Text -->
+        <ImageView
+            android:id="@+id/header_image"
+            android:layout_width="200dp"
+            android:layout_height="100dp"
+            android:layout_marginBottom="16dp"
+            android:contentDescription="Flow Logo"
+            app:srcCompat="@drawable/flowlogo"/>
+
+        <TextView
+            android:id="@+id/title_text"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="About Flow Anguilla Travel eSIM"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:gravity="center"
+            android:layout_marginBottom="16dp"
+            android:textColor="@android:color/black" />
+
+        <!-- Description Text -->
+        <TextView
+            android:id="@+id/description_text"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:text="Say goodbye to costly roaming charges and experience uninterrupted internet access on all your adventures.\n\nStay connected easily and maintain communication with colleagues, friends, and family, all while enjoying local rates and seamless network coverage."
+            android:textSize="16sp"
+            android:lineSpacingExtra="4dp"
+            android:gravity="center"
+            android:layout_marginBottom="24dp"
+            android:textColor="@android:color/black" />
+
+        <!-- Buy a Plan Button -->
+        <Button
+            android:id="@+id/buy_plan_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Buy a Plan"
+            android:backgroundTint="@android:color/holo_blue_light"
+            android:textColor="@android:color/white"
+
+            android:drawablePadding="8dp"
+            android:paddingHorizontal="24dp"
+            android:paddingVertical="12dp"
+            android:layout_gravity="center" />
+
+
+
+    </LinearLayout>
+</ScrollView>

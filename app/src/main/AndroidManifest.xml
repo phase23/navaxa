@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="com.plus.navigation">
+    package="com.plus.navanguilla">
     <!--
          The ACCESS_COARSE/FINE_LOCATION permissions are not required to use
          Google Maps Android API v2, but you must specify either coarse or fine
@@ -31,40 +31,43 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme.NoActionBar">
         <activity
-            android:name="com.plus.navigation.SelectCountry"
+            android:name=".Esims"
             android:exported="false" />
         <activity
-            android:name="com.plus.navigation.Loaddiscounts"
+            android:name=".SelectCountry"
             android:exported="false" />
         <activity
-            android:name="com.plus.navigation.Contactus"
+            android:name=".Loaddiscounts"
             android:exported="false" />
         <activity
-            android:name="com.plus.navigation.Nointernet"
+            android:name=".Contactus"
             android:exported="false" />
         <activity
-            android:name="com.plus.navigation.Nopermission"
+            android:name=".Nointernet"
             android:exported="false" />
         <activity
-            android:name="com.plus.navigation.Locationyes"
+            android:name=".Nopermission"
             android:exported="false" />
         <activity
-            android:name="com.plus.navigation.Disclosure"
+            android:name=".Locationyes"
             android:exported="false" />
         <activity
-            android:name="com.plus.navigation.Loadevents"
+            android:name=".Disclosure"
             android:exported="false" />
         <activity
-            android:name="com.plus.navigation.Renturnhome"
+            android:name=".Loadevents"
             android:exported="false" />
         <activity
-            android:name="com.plus.navigation.Islandtour"
+            android:name=".Renturnhome"
             android:exported="false" />
         <activity
-            android:name="com.plus.navigation.Loadmaps"
+            android:name=".Islandtour"
             android:exported="false" />
         <activity
-            android:name="com.plus.navigation.Pickup"
+            android:name=".Loadmaps"
+            android:exported="false" />
+        <activity
+            android:name=".Pickup"
             android:exported="false"
             android:screenOrientation="portrait" />
         <!--
@@ -76,7 +79,7 @@
              You can define the keys for the debug and release targets in src/debug/ and src/release/.
         -->
         <receiver
-            android:name="com.plus.navigation.BootReceiver"
+            android:name=".BootReceiver"
             android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
@@ -88,15 +91,15 @@
             android:value="@string/google_maps_key" />
 
         <activity
-            android:name="com.plus.navigation.Loaditems"
+            android:name=".Loaditems"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.plus.navigation.Myactivity"
+            android:name=".Myactivity"
             android:exported="false"
             android:screenOrientation="portrait" />
         <activity
-            android:name="com.plus.navigation.MainActivity"
+            android:name=".MainActivity"
             android:exported="true"
             android:screenOrientation="portrait">
             <intent-filter>
@@ -108,7 +111,7 @@
         </activity>
 
         <service
-            android:name="com.plus.navigation.Myservice"
+            android:name=".Myservice"
             android:enabled="true" />
     </application>
 

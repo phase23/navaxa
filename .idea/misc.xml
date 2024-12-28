@@ -3,14 +3,20 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
+        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/advertiser_background.xml" value="0.1" />
+        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/book_button_background.xml" value="0.1" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/button_background_res.xml" value="0.1" />
+        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/default_background.xml" value="0.1" />
+        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/reserve_button_background.xml" value="0.1" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/rounded_button_background.xml" value="0.1203125" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/rounded_button_background_beach.xml" value="0.1203125" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/rounded_button_background_ent.xml" value="0.1" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/rounded_button_background_ent_main.xml" value="0.1" />
+        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/rounded_button_background_esims.xml" value="0.1" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/drawable/rounded_button_background_food.xml" value="0.1203125" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_contactus.xml" value="0.33" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_disclosure.xml" value="0.25" />
+        <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_esims.xml" value="0.20416666666666666" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_islandtour.xml" value="0.12864583333333332" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_loadactivity.xml" value="0.15208333333333332" />
         <entry key="..\:/Users/User/Documents/NavAnguilla/app/src/main/res/layout/activity_loaddiscounts.xml" value="0.16458333333333333" />
