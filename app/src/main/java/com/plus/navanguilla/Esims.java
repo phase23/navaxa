@@ -46,11 +46,12 @@ public class Esims extends AppCompatActivity {
                 String url = "https://xcape.ai/esims/?os=android&country="+thiscountry; // Replace with your actual URL
                 Intent intent = new Intent(Intent.ACTION_VIEW);
                 intent.setData(Uri.parse(url));
+                startActivity(intent); // Launch the browser
                 // Verify that there is an app available to handle the Intent
                 if (intent.resolveActivity(getPackageManager()) != null) {
-                    startActivity(intent); // Launch the browser
+                  //  startActivity(intent); // Launch the browser
                 } else {
-                    Toast.makeText(getApplicationContext(), "No browser app found to open the link", Toast.LENGTH_LONG).show();
+                   // Toast.makeText(getApplicationContext(), "No browser app found to open the link", Toast.LENGTH_LONG).show();
                 }
 
 
